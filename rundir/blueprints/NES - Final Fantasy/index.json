@@ -1,0 +1,27 @@
+{
+    "lusch header":
+    {
+        "lusch version":        "dev",
+        "blueprint version":    "dev"
+    },
+    "files":
+    [
+        {
+            "id":           "srcfile",
+            "name":         "Source ROM",
+            "optional":     false,
+            "directory":    false,
+            "write":        false
+        },{
+            "id":           "dstfile",
+            "name":         "Destination ROM",
+            "optional":     false,
+            "directory":    false,
+            "write":        true
+        }
+    ],
+    "sections":
+    [
+        { "name": "Armor Stats",        "import": "importArmor",        "export": "exportArmor"       }
+    ]
+}

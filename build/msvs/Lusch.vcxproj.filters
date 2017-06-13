@@ -1,0 +1,161 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{D9D6E242-F8AF-46E4-B9FD-80ECBC20BA3E}</UniqueIdentifier>
+      <Extensions>qrc;*</Extensions>
+      <ParseFiles>false</ParseFiles>
+    </Filter>
+    <Filter Include="Generated Files">
+      <UniqueIdentifier>{71ED8ED8-ACB9-4CE9-BBE1-E00B30144E11}</UniqueIdentifier>
+      <Extensions>moc;h;cpp</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+    <Filter Include="Generated Files\Debug">
+      <UniqueIdentifier>{3f64c57a-bdf6-43ab-a6b5-36e730d623aa}</UniqueIdentifier>
+      <Extensions>cpp;moc</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+    <Filter Include="Generated Files\Release">
+      <UniqueIdentifier>{f1ba7a01-1442-41ee-9eb8-a5817ce3b215}</UniqueIdentifier>
+      <Extensions>cpp;moc</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{238cfbcc-d776-446f-b287-f521c58aa020}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\gui">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="src\%28root%29">
+      <UniqueIdentifier>{73387f9f-3691-4961-9579-a928ef2bc8ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\core">
+      <UniqueIdentifier>{f8c1068e-b313-4adb-a181-130b1dede0c3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\util">
+      <UniqueIdentifier>{2954f98d-c2f5-4583-8ff7-d4f15a4dbd4e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\lua">
+      <UniqueIdentifier>{1725284f-b4f5-4dba-9d7f-4465d584ab60}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\gui\luschapp.cpp">
+      <Filter>src\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_luschapp.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_luschapp.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\log.cpp">
+      <Filter>src\%28root%29</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\main.cpp">
+      <Filter>src\%28root%29</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\gui\loggerwindow.cpp">
+      <Filter>src\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_loggerwindow.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_loggerwindow.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\gui\editortreemodel.cpp">
+      <Filter>src\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_editortreemodel.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_editortreemodel.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\core\blueprint.cpp">
+      <Filter>src\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\util\dirtraverser_qdir.cpp">
+      <Filter>src\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lua\luaobj.cpp">
+      <Filter>src\lua</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_blueprint.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_blueprint.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lua\lua_environment.cpp">
+      <Filter>src\lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lua\lua_iofile.cpp">
+      <Filter>src\lua</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_projectdata.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_projectdata.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\core\project.cpp">
+      <Filter>src\core</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\..\src\gui\luschapp.h">
+      <Filter>src\gui</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\gui\loggerwindow.h">
+      <Filter>src\gui</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\gui\editortreemodel.h">
+      <Filter>src\gui</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\core\blueprint.h">
+      <Filter>src\core</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\core\projectdata.h">
+      <Filter>src\core</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\src\log.h">
+      <Filter>src\%28root%29</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\util\dirtraverser.h">
+      <Filter>src\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\error.h">
+      <Filter>src\%28root%29</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\util\dirtraverser_qdir.h">
+      <Filter>src\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\util\picojson.h">
+      <Filter>src\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\util\qtjson.h">
+      <Filter>src\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lua\luaobj.h">
+      <Filter>src\lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lua\luauserdata.h">
+      <Filter>src\lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lua\luastacksaver.h">
+      <Filter>src\lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lua\lua_iofile.h">
+      <Filter>src\lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\core\project.h">
+      <Filter>src\core</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
