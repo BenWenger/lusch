@@ -58,8 +58,9 @@ namespace lsh
                                 static void pushGlobal (lua_State* L, const std::string& name);
         template <typename T>   static void pushMember (lua_State* L, const std::string& name);
         template <typename T>   static void pushBounded(lua_State* L, const std::string& name);
-
+        
         template <typename T>   static bool isMemberListEmpty();
+        template <typename T>   static bool isBoundedListEmpty();
 
     private:
         static std::map<std::string, int (*)(Lua&)>         globalMap;
@@ -185,6 +186,12 @@ namespace lsh
     inline bool LuaFunction::isMemberListEmpty()
     {
         return Hack<T>::memberMap.empty();
+    }
+    
+    template <typename T>
+    inline bool LuaFunction::isBoundedListEmpty()
+    {
+        return Hack<T>::boundedMap.empty();
     }
 
     inline void LuaFunction::pushGlobal(lua_State* L, const std::string& name)

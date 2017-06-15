@@ -8,12 +8,18 @@
 #include "util/qtjson.h"
 #include "lua/lua_wrapper.h"
 #include "projectdata.h"
+#include "lua/lua_binding.h"
 
 namespace lsh
 {
-    class Project
+    class Project : public LuaBinding<Project>
     {
     public:
+                    Project();
+                    Project(Project&&);
+                    Project(const Project&) = delete;
+        Project&    operator = (Project&&);
+        Project&    operator = (const Project&) = delete;
         void        bindToLua(Lua& lua);
 
 
