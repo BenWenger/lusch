@@ -109,9 +109,12 @@ namespace lsh
     //////////////////////////////////////////////////
     //////////////////////////////////////////////////
     
-    void Lua::buildLuaEnvironment()
+    int Lua::callFunction(int nparams, int nrets)
     {
-        // TODO
+        //  TODO figure out the message handler
+        //    and in fact, figure out all of this!!!
+
+        return lua_pcall(L, nparams, nrets, 0);
     }
 
 }

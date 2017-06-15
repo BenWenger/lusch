@@ -19,6 +19,7 @@
     <ClCompile Include="..\..\src\log.cpp" />
     <ClCompile Include="..\..\src\lua\lua_function.cpp" />
     <ClCompile Include="..\..\src\lua\lua_wrapper.cpp" />
+    <ClCompile Include="..\..\src\lua\lua_wrapper_environment.cpp" />
     <ClCompile Include="..\..\src\lua\objects\lua_iofile.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />
     <ClCompile Include="..\..\src\util\dirtraverser_qdir.cpp" />

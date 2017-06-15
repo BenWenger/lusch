@@ -69,6 +69,9 @@ namespace lsh
         // Implicit cast to lua_State so we can use standard lua functions
         inline operator lua_State* ()           { assertActive();       return L;   }
 
+        // Calling functions!
+        int             callFunction(int nparams, int nrets);
+
         // String shit
         void            pushString(const std::string& str);
         std::string     toString(int index);
@@ -84,9 +87,13 @@ namespace lsh
     private:
         lua_State*      L;
 
-        void            buildLuaEnvironment();
-
         inline void     assertActive() { if(!L) throw Error("Internal Error:  Lua object used after state was moved");  }
+
+        
+
+        /////////////////////////////////////
+        //  Defined in lua_wrapper_environment.cpp
+        void            buildLuaEnvironment();
     };
 }
 

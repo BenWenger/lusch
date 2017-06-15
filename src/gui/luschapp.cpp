@@ -30,6 +30,8 @@ namespace lsh
         Log::inf( inf.filePath() );
         */
 
+        Lua instance;
+        /*
         auto filename = QFileDialog::getOpenFileName(this, "Select blueprint file", QString(), "Blueprint Files (*.lshbp index.json);;All Files (*)", nullptr, QFileDialog::DontConfirmOverwrite);
         try
         {
@@ -39,6 +41,7 @@ namespace lsh
         catch(...)
         {
         }
+        */
     }
 
 #define MENU(str, code, func)     \

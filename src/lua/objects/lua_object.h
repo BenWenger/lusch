@@ -111,6 +111,8 @@ namespace lsh
             Ptr p = **pp;
             if(!p)              throw Error("Internal error: Raw pointer in user data when attempting to get object off Lua stack");
 
+            // TODO - do __eq????
+
             auto ret = std::dynamic_pointer_cast<T>( p );
             if(!ret)
                 throw Error(std::string("Expected ") + errname + " to be of type " + T::getClassName());
