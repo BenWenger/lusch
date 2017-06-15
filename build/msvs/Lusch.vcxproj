@@ -17,9 +17,9 @@
     <ClCompile Include="..\..\src\gui\loggerwindow.cpp" />
     <ClCompile Include="..\..\src\gui\luschapp.cpp" />
     <ClCompile Include="..\..\src\log.cpp" />
-    <ClCompile Include="..\..\src\lua\luaobj.cpp" />
-    <ClCompile Include="..\..\src\lua\lua_environment.cpp" />
-    <ClCompile Include="..\..\src\lua\lua_iofile.cpp" />
+    <ClCompile Include="..\..\src\lua\lua_function.cpp" />
+    <ClCompile Include="..\..\src\lua\lua_wrapper.cpp" />
+    <ClCompile Include="..\..\src\lua\objects\lua_iofile.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />
     <ClCompile Include="..\..\src\util\dirtraverser_qdir.cpp" />
     <ClCompile Include="GeneratedFiles\Debug\moc_blueprint.cpp">
@@ -88,10 +88,12 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DWIN64 -DQT_DLL -DPICOJSON_USE_INT64 -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtWidgets"</Command>
     </CustomBuild>
     <ClInclude Include="..\..\src\error.h" />
-    <ClInclude Include="..\..\src\lua\luaobj.h" />
-    <ClInclude Include="..\..\src\lua\luastacksaver.h" />
-    <ClInclude Include="..\..\src\lua\luauserdata.h" />
-    <ClInclude Include="..\..\src\lua\lua_iofile.h" />
+    <ClInclude Include="..\..\src\lua\lua_binding.h" />
+    <ClInclude Include="..\..\src\lua\lua_function.h" />
+    <ClInclude Include="..\..\src\lua\lua_stacksaver.h" />
+    <ClInclude Include="..\..\src\lua\lua_wrapper.h" />
+    <ClInclude Include="..\..\src\lua\objects\lua_iofile.h" />
+    <ClInclude Include="..\..\src\lua\objects\lua_object.h" />
     <ClInclude Include="..\..\src\util\dirtraverser.h" />
     <ClInclude Include="..\..\src\util\dirtraverser_qdir.h" />
     <ClInclude Include="..\..\src\util\picojson.h" />

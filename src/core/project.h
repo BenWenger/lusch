@@ -4,8 +4,10 @@
 #include <stdexcept>
 #include <QString>
 #include <vector>
+#include <unordered_map>
 #include "util/qtjson.h"
-#include "lua/luaobj.h"
+#include "lua/lua_wrapper.h"
+#include "projectdata.h"
 
 namespace lsh
 {
@@ -19,6 +21,9 @@ namespace lsh
         int         lua_openFile(Lua& lua);
         int         lua_setData(Lua& lua);
         int         lua_getData(Lua& lua);
+
+
+        std::unordered_map<std::string, ProjectData>        dat;
     };
 
 }

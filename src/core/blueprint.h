@@ -5,7 +5,7 @@
 #include <QString>
 #include <vector>
 #include "util/qtjson.h"
-#include "lua/luaobj.h"
+#include "lua/lua_wrapper.h"
 
 namespace lsh
 {

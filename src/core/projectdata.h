@@ -36,9 +36,9 @@ namespace lsh
         void    dataChanged(ProjectData* dat);
 
     private:
-        Type            type;
-        int_t           v_int;
-        double          v_dbl;
+        Type            type = Type::Null;
+        int_t           v_int = 0;
+        double          v_dbl = 0;
         std::string     v_str;
         // TODO object
 

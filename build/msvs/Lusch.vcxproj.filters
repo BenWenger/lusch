@@ -40,6 +40,9 @@
     <Filter Include="src\lua">
       <UniqueIdentifier>{1725284f-b4f5-4dba-9d7f-4465d584ab60}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\lua\objects">
+      <UniqueIdentifier>{1ddcdbd4-45a4-438d-800f-f30cebc4a631}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\gui\luschapp.cpp">
@@ -81,20 +84,11 @@
     <ClCompile Include="..\..\src\util\dirtraverser_qdir.cpp">
       <Filter>src\util</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\lua\luaobj.cpp">
-      <Filter>src\lua</Filter>
-    </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_blueprint.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_blueprint.cpp">
       <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\lua\lua_environment.cpp">
-      <Filter>src\lua</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\lua\lua_iofile.cpp">
-      <Filter>src\lua</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_projectdata.cpp">
       <Filter>Generated Files\Debug</Filter>
@@ -104,6 +98,15 @@
     </ClCompile>
     <ClCompile Include="..\..\src\core\project.cpp">
       <Filter>src\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lua\lua_function.cpp">
+      <Filter>src\lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lua\lua_wrapper.cpp">
+      <Filter>src\lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lua\objects\lua_iofile.cpp">
+      <Filter>src\lua\objects</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -142,20 +145,26 @@
     <ClInclude Include="..\..\src\util\qtjson.h">
       <Filter>src\util</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\lua\luaobj.h">
-      <Filter>src\lua</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\lua\luauserdata.h">
-      <Filter>src\lua</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\lua\luastacksaver.h">
-      <Filter>src\lua</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\lua\lua_iofile.h">
-      <Filter>src\lua</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\core\project.h">
       <Filter>src\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lua\lua_wrapper.h">
+      <Filter>src\lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lua\lua_function.h">
+      <Filter>src\lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lua\lua_stacksaver.h">
+      <Filter>src\lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lua\lua_binding.h">
+      <Filter>src\lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lua\objects\lua_object.h">
+      <Filter>src\lua\objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lua\objects\lua_iofile.h">
+      <Filter>src\lua\objects</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
