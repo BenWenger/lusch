@@ -1,11 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{D9D6E242-F8AF-46E4-B9FD-80ECBC20BA3E}</UniqueIdentifier>
-      <Extensions>qrc;*</Extensions>
-      <ParseFiles>false</ParseFiles>
-    </Filter>
     <Filter Include="Generated Files">
       <UniqueIdentifier>{71ED8ED8-ACB9-4CE9-BBE1-E00B30144E11}</UniqueIdentifier>
       <Extensions>moc;h;cpp</Extensions>
@@ -111,6 +106,18 @@
     <ClCompile Include="..\..\src\lua\lua_wrapper_environment.cpp">
       <Filter>src\lua</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\util\filename.cpp">
+      <Filter>src\util</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_project.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_project.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\core\programsettings.cpp">
+      <Filter>src\core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\src\gui\luschapp.h">
@@ -126,6 +133,9 @@
       <Filter>src\core</Filter>
     </CustomBuild>
     <CustomBuild Include="..\..\src\core\projectdata.h">
+      <Filter>src\core</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\core\project.h">
       <Filter>src\core</Filter>
     </CustomBuild>
   </ItemGroup>
@@ -148,9 +158,6 @@
     <ClInclude Include="..\..\src\util\qtjson.h">
       <Filter>src\util</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\core\project.h">
-      <Filter>src\core</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\lua\lua_wrapper.h">
       <Filter>src\lua</Filter>
     </ClInclude>
@@ -168,6 +175,21 @@
     </ClInclude>
     <ClInclude Include="..\..\src\lua\objects\lua_iofile.h">
       <Filter>src\lua\objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\core\fileinfo.h">
+      <Filter>src\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\util\filename.h">
+      <Filter>src\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\util\safecall.h">
+      <Filter>src\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\core\programsettings.h">
+      <Filter>src\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\versioninfo.h">
+      <Filter>src\%28root%29</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

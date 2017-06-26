@@ -5,20 +5,20 @@
 #include <QMenuBar>
 #include <QTreeView>
 #include <QFileDialog>
+#include <QMessageBox>
+#include <QCloseEvent>
 
 
 #include <QFileInfo>
 #include "loggerwindow.h"
 #include "core/blueprint.h"
 
+#include "util/filename.h"
+#include "util/safecall.h"
+
 
 namespace lsh
 {
-    void LuschApp::onDbg()      { Log::dbg("debug message");    }
-    void LuschApp::onInf()      { Log::inf("info message");     }
-    void LuschApp::onWrn()      { Log::wrn("warning message");  }
-    void LuschApp::onErr()      { Log::err("error message");    }
-
     void LuschApp::onLaunch(const QModelIndex& index)
     {/*
         QString launchString = index.data(EditorTreeModel::LaunchRole).toString();
@@ -29,8 +29,16 @@ namespace lsh
         QFileInfo inf("A/File/That/Doesnt/Exist.bat");
         Log::inf( inf.filePath() );
         */
+        /*
+        try
+        {
+            Log::inf( FileName( "C:\\what\\.\\\\is\\deleted\\..\\", "something/////////////\\\\", "waaaaat") );
+        }
+        catch(std::exception& e)
+        {
+            Log::err(e.what());
+        }*/
 
-        Lua instance;
         /*
         auto filename = QFileDialog::getOpenFileName(this, "Select blueprint file", QString(), "Blueprint Files (*.lshbp index.json);;All Files (*)", nullptr, QFileDialog::DontConfirmOverwrite);
         try
@@ -54,6 +62,9 @@ namespace lsh
     LuschApp::LuschApp(QWidget *parent)
         : QMainWindow(parent)
     {
+        buildActions();
+        buildMenu();
+
         //  The editor host is the central widget for this window
         editorHost = new QMainWindow(this);
         editorHost->setWindowFlags(Qt::Widget);
@@ -78,6 +89,7 @@ namespace lsh
 
         ///////////////////////////////
         //  Temporary menu
+        /*
         auto menubar = menuBar();
         auto fmenu = menubar->addMenu("&Temp");
         
@@ -85,6 +97,7 @@ namespace lsh
         MENU( "Info\tCtrl+2", 2, onInf );
         MENU( "Warning\tCtrl+3", 3, onWrn );
         MENU( "Error\tCtrl+4", 4, onErr );
+        */
         /*
         auto act = new QAction("&Temp\tCtrl+T", this);
         act->setShortcut( Qt::Key_T | Qt::CTRL );
@@ -135,6 +148,49 @@ namespace lsh
         idk3->setAllowedAreas(Qt::AllDockWidgetAreas);
         subwindow->addDockWidget(Qt::RightDockWidgetArea, idk3);
         */
+    }
+
+    void LuschApp::buildActions()
+    {
+        auto makeAction = [&] (QAction*& act, const std::string& name, QKeySequence shortcut, void (LuschApp::*clbk)())
+        {
+            act = new QAction( tr(name.c_str()), this );
+            act->setShortcut( shortcut );
+            connect( act, &QAction::triggered, this, clbk );
+        };
+        
+        makeAction( actNewProject,  "&New Project",     QKeySequence::New,          &LuschApp::onNewProject     );
+        makeAction( actOpenProject, "&Open Project",    QKeySequence::Open,         &LuschApp::onOpenProject    );
+        makeAction( actSaveProject, "&Save Project",    QKeySequence::Save,         &LuschApp::onSaveProject    );
+        makeAction( actExit,        "E&xit",            QKeySequence::Quit,         &LuschApp::onExit           );
+    }
+
+    void LuschApp::buildMenu()
+    {
+        auto main = menuBar();
+        
+        auto menu_file = main->addMenu("&File");
+        menu_file->addAction( actNewProject );
+        menu_file->addAction( actOpenProject );
+        menu_file->addAction( actSaveProject );
+        menu_file->addSeparator();
+        menu_file->addAction( actExit );
+
+        actSaveProject->setEnabled(false);
+    }
+
+    void LuschApp::onNewProject()       { /* TODO   */  }
+    void LuschApp::onOpenProject()      { /* TODO   */  }
+    void LuschApp::onSaveProject()      { /* TODO   */  }
+
+    void LuschApp::closeEvent(QCloseEvent* evt)
+    {
+        BEGIN_SAFE
+
+        if( !project.promptIfDirty( this, "Save changes to project before exiting?" ) )
+            evt->ignore();
+
+        END_SAFE
     }
 
 }

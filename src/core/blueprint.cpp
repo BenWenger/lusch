@@ -6,6 +6,7 @@
 #include "util/qtjson.h"
 #include "log.h"
 #include <set>
+#include "fileinfo.h"
 
 namespace lsh
 {
@@ -140,7 +141,7 @@ namespace lsh
         return SectionInfo();
     }
     
-    Blueprint::FileInfo Blueprint::loadFileInfoFromJson(const json::object& info)
+    FileInfo Blueprint::loadFileInfoFromJson(const json::object& info)
     {
         FileInfo out;
         for(auto& i : info)

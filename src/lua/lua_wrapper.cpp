@@ -80,6 +80,12 @@ namespace lsh
             throw Error( std::string("Too many parameters passed to '") + func_name + "'. Expected a maximum of " + std::to_string(maxparams) + " params." );
     }
     
+    void Lua::checkTooFewParams(int minparams, const char* func_name)
+    {
+        if(lua_gettop(L) < minparams)
+            throw Error( std::string("Too few parameters passed to '") + func_name + "'. Expected a minimum of " + std::to_string(minparams) + " params." );
+    }
+    
     lua_Integer Lua::getIntParam(int index, const char* func_name)
     {
         if(!lua_isinteger(L,index))

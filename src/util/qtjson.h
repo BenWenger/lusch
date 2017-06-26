@@ -5,6 +5,7 @@
 #include "picojson.h"
 #include <string>
 #include <QIODevice>
+#include <QByteArray>
 
 namespace json = picojson;
 
@@ -36,6 +37,11 @@ namespace lsh
             throw Error("Json file does not contain a root object.");
 
         return output.get<json::object>();
+    }
+
+    inline std::string QByteArrayToString(const QByteArray& v)
+    {
+        return std::string( v.data(), v.size() );
     }
 }
 

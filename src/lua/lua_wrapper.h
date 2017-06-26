@@ -78,6 +78,7 @@ namespace lsh
 
         // Parameter shit
         void            checkTooManyParams(int maxparams, const char* func_name);
+        void            checkTooFewParams(int minparams, const char* func_name);
 
         std::string     getStringParam(int index, const char* func_name);
         std::string     getStringParam(int index, const char* func_name, const std::string& defoption);

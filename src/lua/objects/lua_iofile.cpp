@@ -14,36 +14,28 @@ namespace lsh
 
     ///////////////////////////////////////////////////////
 
-    std::shared_ptr<LuaIOFile> LuaIOFile::open(const std::string& filepath, std::string mode)
+    int LuaIOFile::openForLua(Lua& lua, const std::string& filepath, const FileFlags& modeinfo)
     {
-        bool binary = false;
-        if(!mode.empty() && mode.back() == 'b')
-        {
-            binary = true;
-            mode.pop_back();
-        }
-
-        int qmode = binary ? 0 : QIODevice::Text;
-        
-        if     (mode == "r")    qmode |= QIODevice::ReadOnly;
-        else if(mode == "w")    qmode |= QIODevice::WriteOnly | QIODevice::Truncate;
-        else if(mode == "a")    qmode |= QIODevice::Append;
-        else if(mode == "r+")   qmode |= QIODevice::ReadWrite;
-        else if(mode == "w+")   qmode |= QIODevice::ReadWrite | QIODevice::Truncate;
-        else if(mode == "a+")   qmode |= QIODevice::ReadOnly | QIODevice::Append;
-        else
-        {
-            Log::dbg("Invalid mode '" + mode + "' given to io.open");
-            return nullptr;
-        }
+        int qmode = modeinfo.binary ? 0 : QIODevice::Text;
+        if(modeinfo.read)           qmode |= QIODevice::ReadOnly;
+        if(modeinfo.write)          qmode |= QIODevice::WriteOnly;
+        if(modeinfo.trunc)          qmode |= QIODevice::Truncate;
+        if(modeinfo.append)         qmode |= QIODevice::Append;
 
         //////////////////////
-        auto out = std::shared_ptr<LuaIOFile>(new LuaIOFile);
-        out->file.setFileName( QString::fromStdString(filepath) );
-        if(!out->file.open(QIODevice::OpenModeFlag(qmode)))
-            return nullptr;
-
-        return out;
+        auto outfile = std::shared_ptr<LuaIOFile>(new LuaIOFile);
+        outfile->file.setFileName( QString::fromStdString(filepath) );
+        if(outfile->file.open(QIODevice::OpenModeFlag(qmode)))
+        {
+            outfile->pushToLua(lua);
+            return 1;
+        }
+        else
+        {
+            // TODO log error message ??  or push it ??
+            lua_pushnil(lua);
+            return 1;
+        }
     }
 
     /////////////////////////////////////////////////////////////

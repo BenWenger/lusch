@@ -7,6 +7,7 @@
     file objects ( obtained via io.open() )
  */
 
+#include "core/fileinfo.h"
 #include "lua/lua_function.h"
 #include "lua_object.h"
 #include <memory>
@@ -17,10 +18,10 @@ namespace lsh
     class LuaIOFile : public LuaUserData<LuaIOFile>
     {
     public:
-        static std::shared_ptr<LuaIOFile>       open(const std::string& filepath, std::string mode);
+        static int          openForLua(Lua& lua, const std::string& filepath, const FileFlags& mode);
 
-        static const char*                      getClassName()                  { return "io:file";     }
-        static void                             registerMemberFunctions();
+        static const char*  getClassName()                  { return "io:file";     }
+        static void         registerMemberFunctions();
 
     private:
         int     lua_close(Lua& lua);

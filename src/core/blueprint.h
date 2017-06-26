@@ -6,6 +6,7 @@
 #include <vector>
 #include "util/qtjson.h"
 #include "lua/lua_wrapper.h"
+#include "fileinfo.h"
 
 namespace lsh
 {
@@ -19,15 +20,6 @@ namespace lsh
                     Blueprint() = default;
         void        load(const QString& filename);
         void        unload();
-        
-        struct FileInfo
-        {
-            std::string     id;
-            QString         displayName;
-            bool            optional        = false;
-            bool            directory       = false;
-            bool            writable        = false;
-        };
 
         struct SectionInfo
         {
