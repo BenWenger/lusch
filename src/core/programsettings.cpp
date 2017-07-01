@@ -20,12 +20,12 @@ namespace lsh
             auto& blk = (out["directories"] = json::value( json::object() )).get<json::object>();
 
             if(absoluteBlueprintDir)        blk["blueprint"] = json::value( blueprintDirectory );
-            else                            blk["blueprint"] = json::value( FileName::makeRelativeTo(blueprintDirectory) );
+//            else                            blk["blueprint"] = json::value( FileName::makeRelativeTo(blueprintDirectory) );
         }
         {
             auto& blk = (out["mainwindow"] = json::value( json::object() )).get<json::object>();
 
-            blk["geometry"] = json::value( 
+//            blk["geometry"] = json::value( 
         }
 
 

@@ -64,65 +64,49 @@ namespace lsh
         FileFlags flgs;
         if(!flgs.fromStringMode(mode))              throw Error("Invalid mode string '" + mode + "' passed to io.open");
 
-        name = translateFileName(name);
-        verifyFileOpenPath(name, flgs.write);
+        bool waswritable;
+        auto filename = translateFileName(name, waswritable);
 
-        return LuaIOFile::openForLua(lua, name, flgs);
+        if(flgs.write && !waswritable)              throw Error("File '" + name + "' is marked in the project as read-only and cannot be opened for writing.");
+
+        return LuaIOFile::openForLua(lua, filename.getFullPath(true), flgs);
     }
     
-    std::string Project::translateFileName(const std::string& givenname)
+    FileName Project::translateFileName(const std::string& givenname, bool& waswritable)
     {
-        std::string path;
+        // If there's a '/' in the given name, everything left of the / is a directory ID
+        // Otherwise, the whole thing is a file ID
 
-        std::string prefix;
-        std::string suffix;
+        auto slsh = givenname.find('/');
+        std::string id = givenname.substr(0,slsh);
 
-        auto i = givenname.find('$');
-        if(i == std::string::npos)
-            prefix = givenname;
+        // Find the ID in the files list
+        auto item = fileInfo.find(id);
+        if(item == fileInfo.end())          throw Error("Unrecognized file ID:  '" + id + "'");
+
+        FileName out;
+
+        if(slsh == givenname.npos)
+        {
+            // Normal file?
+            if(item->second.directory)      throw Error("File ID '" + id + "' is a directory, not a file.  If you meant to use the directory, append a slash (/).");
+            out = item->second.fileName;
+            out.makeAbsoluteWith( projectFileName );
+        }
         else
         {
-            prefix = givenname.substr(0, i);
-            suffix = givenname.substr(i+1);
+            // Directory
+            if(!item->second.directory)     throw Error("File ID '" + id + "' is a file, not a directory.  You cannot use a slash (/) when accessing this file.");
+            FileName base = item->second.fileName;
+            base.makeAbsoluteWith( projectFileName );
+
+            out.setFullPath( givenname.substr(slsh+1) );
+            if(out.beginsWithDoubleDot())   throw Error("Given file '" + givenname + "' moves outside of directory indicated by '" + id + "'.  This directory is inaccessible.");
+            out.makeAbsoluteWith( base );
         }
 
-        // Everything left of the $ is a file ID.  Look the file ID up and replace it with the actual file path
-        auto item = fileInfo.find(prefix);
-        if(item == fileInfo.end())
-            throw Error("io.open:  '" + prefix + "' is not a recognized file ID");
-
-        return FileName(projectFileDir, prefix, suffix);
-    }
-    
-    void Project::verifyFileOpenPath(const std::string& name, bool writable)
-    {
-        bool ok = false;
-
-        for(auto& i : fileInfo)
-        {
-            bool found = false;
-
-            if(i.second.directory)
-            {
-                found = ( name.substr(0, i.second.filePath.length()) == i.second.filePath );
-            }
-            else
-            {
-                found = ( name == i.second.filePath );
-            }
-
-            if(found)
-            {
-                if(!writable || i.second.writable)
-                {
-                    ok = true;
-                    break;
-                }
-            }
-        }
-
-        if(!ok)
-            throw Error( "File: '" + name + "' could not be opened for " + (writable ? "writing" : "reading") + ". It is not part of the project file list." );
+        waswritable = item->second.writable;
+        return out;
     }
 
     // TODO finish this

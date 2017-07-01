@@ -9,6 +9,7 @@
 #include "lua/lua_wrapper.h"
 #include "projectdata.h"
 #include "lua/lua_binding.h"
+#include "util/filename.h"
 #include "fileinfo.h"
 
 
@@ -41,14 +42,12 @@ namespace lsh
         int         lua_getData(Lua& lua);
 
 
-        std::string translateFileName(const std::string& name);
-        void        verifyFileOpenPath(const std::string& name, bool writable);
+        FileName    translateFileName(const std::string& name, bool& waswritable);
 
         bool                loaded;
         bool                dirty;
 
-        std::string                                         projectFileName;
-        std::string                                         projectFileDir;
+        FileName                                            projectFileName;
         std::unordered_map<std::string, FileInfo>           fileInfo;
         std::unordered_map<std::string, ProjectData>        dat;
     };

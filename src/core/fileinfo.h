@@ -3,18 +3,18 @@
 
 #include <string>
 #include <QString>
+#include "util/filename.h"
 
 namespace lsh
 {
     struct FileInfo
     {
         std::string     id;
-        std::string     filePath;
+        FileName        fileName;               // if relative, it's relative to the project file
         QString         displayName;
         bool            optional        = false;
-        bool            directory       = false;
+        bool            directory       = false;// if a directory, 'fileName' should not have a title or extension
         bool            writable        = false;
-        bool            storeAbsolute   = false;
     };
 
     struct FileFlags
