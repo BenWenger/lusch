@@ -7,6 +7,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QCloseEvent>
+#include <QCoreApplication>
 
 
 #include <QFileInfo>
@@ -62,6 +63,8 @@ namespace lsh
     LuschApp::LuschApp(QWidget *parent)
         : QMainWindow(parent)
     {
+        loadCommonFileNames();
+
         buildActions();
         buildMenu();
 
@@ -148,6 +151,9 @@ namespace lsh
         idk3->setAllowedAreas(Qt::AllDockWidgetAreas);
         subwindow->addDockWidget(Qt::RightDockWidgetArea, idk3);
         */
+        
+        setGeometry(100, 100, 1200, 600);     // TODO this is temporary
+        loadProgramSettings();
     }
 
     void LuschApp::buildActions()
@@ -189,8 +195,56 @@ namespace lsh
 
         if( !project.promptIfDirty( this, "Save changes to project before exiting?" ) )
             evt->ignore();
+        else
+            saveProgramSettings();
 
         END_SAFE
+    }
+
+    
+    //////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////
+
+    void LuschApp::loadCommonFileNames()
+    {
+        exeFileName = QCoreApplication::applicationFilePath().toStdString();
+        programSettingsFileName = exeFileName;
+        programSettingsFileName.setFileName("lusch_settings.cfg");
+        int something = 10;
+    }
+
+    void LuschApp::loadProgramSettings()
+    {
+        try
+        {
+            QFile file;
+            file.setFileName( QString::fromStdString( programSettingsFileName.getFullPath(true) ) );
+            if( file.open(QIODevice::ReadOnly | QIODevice::Text) )
+                settings.fromJson( loadJsonFromFile(file) );
+            ////////////////////////////////////////
+            
+            restoreGeometry(settings.mainWindowGeometry);
+            restoreState   (settings.mainWindowState);
+        }
+        catch(...){}
+    }
+    
+    void LuschApp::saveProgramSettings()
+    {
+        try
+        {
+            settings.mainWindowGeometry = saveGeometry();
+            settings.mainWindowState    = saveState();
+
+            ////////////////////////////////////////
+            auto obj = settings.toJson();
+
+            QFile file;
+            file.setFileName( QString::fromStdString( programSettingsFileName.getFullPath(true) ) );
+            if( file.open(QIODevice::WriteOnly | QIODevice::Truncate) )
+                saveJsonToFile(obj, file);
+        }
+        catch(...){}
     }
 
 }

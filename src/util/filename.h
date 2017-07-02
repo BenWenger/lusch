@@ -43,6 +43,7 @@ namespace lsh
         std::string     getFileTitle() const                                { return title;     }
         std::string     getPathOnly(bool use_native_slash = false) const;
 
+        void            set(const std::string& pathonly, const std::string& filename);
         void            setFullPath(const std::string& fullpath);
         void            setFileName(const std::string& filename);
         void            setExt(const std::string& v)                        { ext = v;          }

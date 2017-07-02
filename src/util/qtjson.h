@@ -6,6 +6,7 @@
 #include <string>
 #include <QIODevice>
 #include <QByteArray>
+#include <functional>
 
 namespace json = picojson;
 
@@ -39,9 +40,31 @@ namespace lsh
         return output.get<json::object>();
     }
 
-    inline std::string QByteArrayToString(const QByteArray& v)
+    inline void saveJsonToFile(const json::object& obj, QIODevice& file)
     {
-        return std::string( v.data(), v.size() );
+        auto out = json::value(obj).serialize(true);
+
+        file.write(out.c_str(), out.size());
+    }
+}
+
+namespace picojson
+{
+    template <typename T>
+    inline T& setNew(value& v)
+    {
+        return (v = value( T() )).get<T>();
+    }
+
+    template <typename T>
+    inline bool readField(const object& obj, const std::string& name, std::function<void(const T&)> func)
+    {
+        auto i = obj.find(name);
+        if(i == obj.end())              return false;
+        if(!i->second.is<T>())          return false;
+
+        func(i->second.get<T>());
+        return true;
     }
 }
 

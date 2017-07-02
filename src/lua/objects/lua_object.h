@@ -49,6 +49,25 @@ namespace lsh
         
         virtual                 ~LuaObject() = default;
         void                    pushToLua(Lua& lua);
+        
+        static Ptr getPointerFromLuaStack(Lua& lua, int index, const char* errname)
+        {
+            // I'm doing a lot more safeguarding here than I probably need to.
+
+            if(lua_type(lua, index) != LUA_TUSERDATA)
+                throw Error(std::string("Expected ") + errname + " to be a Lusch Object");
+
+            void* rawptr = lua_touserdata(lua, index);
+            if(!rawptr)         throw Error("Internal error: Raw pointer in user data when attempting to get object off Lua stack");
+
+            Ptr** pp = reinterpret_cast<Ptr**>(rawptr);
+            if(!*pp)            throw Error("Internal error: Raw pointer in user data when attempting to get object off Lua stack");
+
+            Ptr p = **pp;
+            if(!p)              throw Error("Internal error: Raw pointer in user data when attempting to get object off Lua stack");
+
+            return p;
+        }
 
     private:
         // assert that all objects must be derived from LuaUserData<T> and not from this class directly
@@ -97,21 +116,7 @@ namespace lsh
     public:
         static std::shared_ptr<T> getPointerFromLuaStack(Lua& lua, int index, const char* errname)
         {
-            // I'm doing a lot more safeguarding here than I probably need to.
-
-            if(lua_type(lua, index) != LUA_TUSERDATA)
-                throw Error(std::string("Expected ") + errname + " to be of type " + T::getClassName());
-
-            void* rawptr = lua_touserdata(lua, index);
-            if(!rawptr)         throw Error("Internal error: Raw pointer in user data when attempting to get object off Lua stack");
-
-            Ptr** pp = reinterpret_cast<Ptr**>(rawptr);
-            if(!*pp)            throw Error("Internal error: Raw pointer in user data when attempting to get object off Lua stack");
-
-            Ptr p = **pp;
-            if(!p)              throw Error("Internal error: Raw pointer in user data when attempting to get object off Lua stack");
-
-            // TODO - do __eq????
+            Ptr p = LuaObject::getPointerFromLuaStack(lua, index, errname);
 
             auto ret = std::dynamic_pointer_cast<T>( p );
             if(!ret)
@@ -176,6 +181,8 @@ namespace lsh
         lua_setfield(lua, -2, "__index");
         lua_newtable(lua);                              // could this just be nil? ??
         lua_setfield(lua, -2, "__metatable");
+
+                // TODO - do __eq?
 
         // Step 3:  put the shared pointer in Lua owned memory
         *pp = new Ptr( shared_from_this() );

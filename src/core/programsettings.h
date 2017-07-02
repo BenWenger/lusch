@@ -5,13 +5,13 @@
 #include <QByteArray>
 #include <string>
 #include "util/qtjson.h"
+#include "util/filename.h"
 
 namespace lsh
 {
     struct ProgramSettings
     {
-        std::string         blueprintDirectory;     // if stored relative, relative to the exe directory
-        bool                absoluteBlueprintDir;
+        FileName            blueprintDir = FileName("blueprints","");   // if relative, relative to the exe directory
         
         QByteArray          mainWindowGeometry;
         QByteArray          mainWindowState;

@@ -109,9 +109,70 @@ namespace lsh
         return out;
     }
 
-    // TODO finish this
-    int         Project::lua_setData(Lua& lua) { return 0; }
-    int         Project::lua_getData(Lua& lua) { return 0; }
+    int Project::lua_setData(Lua& lua)
+    {
+        lua.checkTooFewParams(2,"lsh.set");
+        lua.checkTooManyParams(2,"lsh.set");
+
+        if(lua_type(lua, 1) != LUA_TSTRING)     throw Error("lsh.set:  Parameter 1 must be a string");
+        auto name = lua.toString(1);
+        
+        auto& item = dat[name];
+
+        connect(&item, &ProjectData::dataChanged, this, &Project::dirtyByData, Qt::ConnectionType(Qt::DirectConnection | Qt::UniqueConnection) );
+
+
+        switch( lua_type(lua, 2) )
+        {
+        case LUA_TNIL:          item.setNull();                         break;
+        case LUA_TSTRING:       item.set( lua.toString(2) );            break;
+        case LUA_TNUMBER:
+            if(lua_isinteger(lua,2))    item.set( lua_tointeger(lua, 2) );
+            else                        item.set( lua_tonumber (lua, 2) );
+            break;
+        case LUA_TBOOLEAN:      item.set( !!lua_toboolean(lua,2) );     break;
+
+        case LUA_TUSERDATA:
+            item.set( LuaObject::getPointerFromLuaStack(lua, 2, "lsh.set 2nd parameter") );
+            break;
+
+        default:
+            throw Error(std::string("Unsupported type (") + lua_typename(lua,2) + ") passed to lsh.set");
+        }
+
+        return 0;
+    }
+
+    int Project::lua_getData(Lua& lua)
+    {
+        lua.checkTooFewParams(1,"lsh.get");
+        lua.checkTooManyParams(1,"lsh.get");
+        
+        if(lua_type(lua, 1) != LUA_TSTRING)     throw Error("lsh.get:  Parameter 1 must be a string");
+        auto name = lua.toString(1);
+
+        auto i = dat.find(name);
+        if(i == dat.end())          // not found, just return nil
+        {
+            lua_pushnil(lua);
+            return 1;
+        }
+
+        auto& item = i->second;
+
+        switch(item.getType())
+        {
+        case ProjectData::Type::Null:       lua_pushnil(lua);                       break;
+        case ProjectData::Type::Bool:       lua_pushboolean(lua, item.asBool());    break;
+        case ProjectData::Type::Int:        lua_pushinteger(lua, item.asInt());     break;
+        case ProjectData::Type::Dbl:        lua_pushnumber(lua, item.asDbl());      break;
+        case ProjectData::Type::Str:        lua.pushString(item.asString());        break;
+        case ProjectData::Type::Obj:        item.asObj()->pushToLua(lua);           break;
+        default:                            throw Error("Internal Error:  ProjectData '" + name + "' has unknown/unexpected type!");
+        }
+
+        return 1;
+    }
 
     
     //////////////////////////////////////////////////////////////////

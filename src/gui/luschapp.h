@@ -4,6 +4,8 @@
 #include <QMainWindow>
 #include "core/project.h"
 #include "editortreemodel.h"
+#include "core/programsettings.h"
+#include "util/filename.h"
 
 namespace lsh
 {
@@ -30,7 +32,10 @@ namespace lsh
         void        onExit()                { close();      }
         
         ////////////////////////////////////////////////
-        Project     project;
+        FileName            exeFileName;
+        FileName            programSettingsFileName;
+        ProgramSettings     settings;
+        Project             project;
 
 
         ////////////////////////////////////////////////
@@ -45,6 +50,10 @@ namespace lsh
 
 
         virtual void    closeEvent(QCloseEvent* evt) override;
+
+        void        loadCommonFileNames();
+        void        loadProgramSettings();
+        void        saveProgramSettings();
     };
 
 }

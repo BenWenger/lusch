@@ -28,19 +28,21 @@ namespace lsh
         void        bindToLua(Lua& lua);
 
         bool        promptIfDirty(QWidget* parent, const char* prompt);
+        bool        isDirty() const { return dirty; }
 
     signals:
         void        loadedChanged(bool loaded);
         void        dirtyChanged(bool dirty);
-
-    public slots:
-        void        makeDirty();
-
+        
     private:
         int         lua_openFile(Lua& lua);
         int         lua_setData(Lua& lua);
         int         lua_getData(Lua& lua);
 
+
+    private:
+        void        makeDirty();
+        void        dirtyByData(ProjectData*)   { makeDirty();      }
 
         FileName    translateFileName(const std::string& name, bool& waswritable);
 

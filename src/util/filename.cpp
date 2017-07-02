@@ -15,6 +15,12 @@ namespace lsh
         setFileName(filename);
     }
 
+    void FileName::set(const std::string& pathonly, const std::string& filename)
+    {
+        setPathOnly(pathonly);
+        setFileName(filename);
+    }
+
     bool FileName::makeAbsoluteWith(const FileName& base)
     {
         if(isAbsolute())            return false;       // already absolute
