@@ -18,7 +18,7 @@ namespace lsh
     class LuaIOFile : public LuaUserData<LuaIOFile>
     {
     public:
-        static int          openForLua(Lua& lua, const std::string& filepath, const FileFlags& mode);
+        static int          openForLua(Lua& lua, const std::string& filepath, const FileFlags& mode, bool mustopen);
 
         static const char*  getClassName()                  { return "io:file";     }
         static void         registerMemberFunctions();

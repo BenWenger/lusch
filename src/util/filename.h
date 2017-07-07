@@ -49,6 +49,7 @@ namespace lsh
         void            setExt(const std::string& v)                        { ext = v;          }
         void            setFileTitle(const std::string& v)                  { title = v;        }
         void            setPathOnly(const std::string& pathname);
+        void            clear();
 
 
     private:

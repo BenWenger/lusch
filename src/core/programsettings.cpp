@@ -20,6 +20,7 @@ namespace lsh
             auto& blk = json::setNew<json::object>(out["directories"]);
 
             blk["blueprint"] = json::value( blueprintDir.getFullPath() );
+            blk["lastProject"] = json::value( lastProjectDir.getFullPath() );
         }
         {
             auto& blk = json::setNew<json::object>(out["mainwindow"]);
@@ -48,7 +49,8 @@ namespace lsh
         ///////////////////////////////////////
         //  "directories" section
         json::readField<json::object>(obj, "directories", [&](const json::object& blk) {
-            json::readField<std::string>(blk, "blueprint", [&](const std::string& v) {  blueprintDir.set(v,"");             });
+            json::readField<std::string>(blk, "blueprint", [&](const std::string& v)    {  blueprintDir.set(v,"");              });
+            json::readField<std::string>(blk, "lastProject", [&](const std::string& v)  {  lastProjectDir.set(v,"");            });
         });
 
         ///////////////////////////////////////

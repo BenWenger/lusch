@@ -12,6 +12,7 @@ namespace lsh
     struct ProgramSettings
     {
         FileName            blueprintDir = FileName("blueprints","");   // if relative, relative to the exe directory
+        FileName            lastProjectDir;
         
         QByteArray          mainWindowGeometry;
         QByteArray          mainWindowState;

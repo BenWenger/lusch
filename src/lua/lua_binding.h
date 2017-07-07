@@ -58,7 +58,7 @@ namespace lsh
         void        removeAllBindings();                            // Remove ALL bindings of this + all lua_States
 
     protected:
-        void        moveBindings(T&& rhs);                          // Effectively a move assignment.  Removes all existing bindings and replaces them with rhs's
+        void        moveBindings(T& rhs);                           // Effectively a move assignment.  Removes all existing bindings and replaces them with rhs's
         void        takeBindingsFrom(T* old);                       // Takes old's bindings and adds them to this, but does not remove any of this's old bindings.
 
     private:
@@ -123,7 +123,7 @@ namespace lsh
     }
 
     template <typename T>
-    void LuaBinding<T>::moveBindings(T&& rhs)
+    void LuaBinding<T>::moveBindings(T& rhs)
     {
         removeAllBindings();
         takeBindingsFrom(&rhs);

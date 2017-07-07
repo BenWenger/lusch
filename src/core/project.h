@@ -11,6 +11,7 @@
 #include "lua/lua_binding.h"
 #include "util/filename.h"
 #include "fileinfo.h"
+#include "blueprint.h"
 
 
 namespace lsh
@@ -21,18 +22,19 @@ namespace lsh
 
     public:
                     Project();
-                    Project(Project&&);
                     Project(const Project&) = delete;
-        Project&    operator = (Project&&);
         Project&    operator = (const Project&) = delete;
-        void        bindToLua(Lua& lua);
+        Project&    operator = (Project&& rhs);
 
-        bool        promptIfDirty(QWidget* parent, const char* prompt);
-        bool        isDirty() const { return dirty; }
+        bool        isDirty() const { return loaded && dirty; }
+
+        void        newProject(const FileName& projectPath, const FileName& bpPathRelative, Blueprint&& bp);
+        
+        void        doImport();
+        bool        doSave();
 
     signals:
-        void        loadedChanged(bool loaded);
-        void        dirtyChanged(bool dirty);
+        void        projectStateChanged();
         
     private:
         int         lua_openFile(Lua& lua);
@@ -45,13 +47,20 @@ namespace lsh
         void        dirtyByData(ProjectData*)   { makeDirty();      }
 
         FileName    translateFileName(const std::string& name, bool& waswritable);
+        void        bindToLua(Lua& lua);
 
-        bool                loaded;
-        bool                dirty;
+        bool                loaded = false;
+        bool                dirty = false;
+        bool                saveCompressed = true;
+        bool                savePretty = true;
 
-        FileName                                            projectFileName;
-        std::unordered_map<std::string, FileInfo>           fileInfo;
-        std::unordered_map<std::string, ProjectData>        dat;
+        Blueprint                                       blueprint;
+        FileName                                        projectFileName;
+        FileName                                        bpFileName;
+        std::unordered_map<std::string, std::size_t>    fileInfoIndexes;
+        std::unordered_map<std::string, ProjectData>    dat;
+        
+        int         doCallback(const char* callback_name, int params, int rets);
     };
 
 }

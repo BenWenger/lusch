@@ -15,10 +15,10 @@ namespace lsh
     class LuaStackSaver
     {
     public:
-        LuaStackSaver(lua_State* x)
+        LuaStackSaver(lua_State* x, int adj = 0)
         {
             L = x;
-            if(L)       stk = lua_gettop(L);
+            if(L)       stk = lua_gettop(L) + adj;
             else        stk = 0;
         }
 

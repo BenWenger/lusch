@@ -8,6 +8,10 @@
 #include "projectdata.h"
 #include "lua/objects/lua_iofile.h"
 #include "util/filename.h"
+#include "blueprint.h"
+#include "log.h"
+#include "util/safecall.h"
+#include "versioninfo.h"
 
 namespace lsh
 {
@@ -22,6 +26,25 @@ namespace lsh
             LuaFunction::addBounded<Project>("lsh.get", &Project::lua_getData);
             LuaFunction::addBounded<Project>("lsh.set", &Project::lua_setData);
         }
+    }
+    
+    Project& Project::operator = (Project&& rhs)
+    {
+        moveBindings(rhs);
+        blueprint =             std::move(rhs.blueprint);
+        projectFileName =       std::move(rhs.projectFileName);
+        bpFileName =            std::move(rhs.bpFileName);
+        fileInfoIndexes =       std::move(rhs.fileInfoIndexes);
+        dat =                   std::move(rhs.dat);
+        loaded =                rhs.loaded;
+        dirty =                 rhs.dirty;
+        savePretty =            rhs.savePretty;
+        saveCompressed =        rhs.saveCompressed;
+
+        // TODO - need to emit a signal that causes all project data ties to be rebound.
+
+        rhs.loaded = rhs.dirty = false;
+        return *this;
     }
 
     void Project::bindToLua(Lua& lua)
@@ -47,10 +70,11 @@ namespace lsh
     int Project::lua_openFile(Lua& lua)
     {
         lua.checkTooFewParams(1, "io.open");
-        lua.checkTooManyParams(2, "io.open");
+        lua.checkTooManyParams(3, "io.open");
 
         std::string name;
         std::string mode = "r";
+        bool mustopen = false;
 
         if(lua_type(lua, 1) == LUA_TSTRING)     name = lua.toString(1);
         else                                    throw Error("In 'io.open', expected parameter 1 to be a string");
@@ -59,6 +83,11 @@ namespace lsh
         {
             if(lua_type(lua, 2) == LUA_TSTRING)     mode = lua.toString(2);
             else                                    throw Error("In 'io.open', expected parameter 2 to be a string");
+        }
+        if(lua_gettop(lua) >= 3)
+        {
+            if(lua_type(lua, 3) == LUA_TBOOLEAN)    mustopen = !!lua_toboolean(lua,3);
+            else                                    throw Error("In 'io.open', expected parameter 3 to be a boolean");
         }
 
         FileFlags flgs;
@@ -69,7 +98,7 @@ namespace lsh
 
         if(flgs.write && !waswritable)              throw Error("File '" + name + "' is marked in the project as read-only and cannot be opened for writing.");
 
-        return LuaIOFile::openForLua(lua, filename.getFullPath(true), flgs);
+        return LuaIOFile::openForLua(lua, filename.getFullPath(true), flgs, mustopen);
     }
     
     FileName Project::translateFileName(const std::string& givenname, bool& waswritable)
@@ -81,23 +110,24 @@ namespace lsh
         std::string id = givenname.substr(0,slsh);
 
         // Find the ID in the files list
-        auto item = fileInfo.find(id);
-        if(item == fileInfo.end())          throw Error("Unrecognized file ID:  '" + id + "'");
+        auto itemIndex = fileInfoIndexes.find(id);
+        if(itemIndex == fileInfoIndexes.end())      throw Error("Unrecognized file ID:  '" + id + "'");
+        auto& item = blueprint.files[itemIndex->second];
 
         FileName out;
 
         if(slsh == givenname.npos)
         {
             // Normal file?
-            if(item->second.directory)      throw Error("File ID '" + id + "' is a directory, not a file.  If you meant to use the directory, append a slash (/).");
-            out = item->second.fileName;
+            if(item.directory)              throw Error("File ID '" + id + "' is a directory, not a file.  If you meant to use the directory, append a slash (/).");
+            out = item.fileName;
             out.makeAbsoluteWith( projectFileName );
         }
         else
         {
             // Directory
-            if(!item->second.directory)     throw Error("File ID '" + id + "' is a file, not a directory.  You cannot use a slash (/) when accessing this file.");
-            FileName base = item->second.fileName;
+            if(!item.directory)             throw Error("File ID '" + id + "' is a file, not a directory.  You cannot use a slash (/) when accessing this file.");
+            FileName base = item.fileName;
             base.makeAbsoluteWith( projectFileName );
 
             out.setFullPath( givenname.substr(slsh+1) );
@@ -105,7 +135,7 @@ namespace lsh
             out.makeAbsoluteWith( base );
         }
 
-        waswritable = item->second.writable;
+        waswritable = item.writable;
         return out;
     }
 
@@ -178,33 +208,91 @@ namespace lsh
     //////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////
+    
+    int Project::doCallback(const char* callback_name, int params, int rets)
+    {
+        LuaStackSaver stk(blueprint.lua, -params);
+
+        auto& x = blueprint.callbacks.find(callback_name);
+        if(x != blueprint.callbacks.end())
+        {
+            if(lua_getglobal(blueprint.lua, x->second.c_str()) != LUA_TFUNCTION)
+            {
+                Log::wrn("'" + std::string(callback_name) + "' is not a global function name.");
+            }
+            else
+            {
+                return blueprint.lua.callFunction(0,rets);
+            }
+        }
+
+        return 0;
+    }
 
     void Project::makeDirty()
     {
         if(dirty)       return;
 
         dirty = true;
-        emit dirtyChanged(true);
+        emit projectStateChanged();
     }
     
-    bool Project::promptIfDirty(QWidget* parent, const char* prompt)
+    void Project::newProject(const FileName& projectPath, const FileName& bpPathRelative, Blueprint&& bp)
     {
-        if(!loaded)     return true;
-        if(!dirty)      return true;
+        projectFileName = projectPath;
+        bpFileName = bpPathRelative;
 
-        auto answer = QMessageBox::warning(parent, "Are you sure?", prompt,
-                                           QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
-                                           QMessageBox::Yes );
-
-        switch(answer)
+        blueprint = std::move(bp);
+        for(auto& i : bp.files)
         {
-        case QMessageBox::No:       return true;
-        case QMessageBox::Yes:      /* save */ break;
-        default:                    return false;
+            i.fileName.clear();
         }
 
-        return !dirty;
+        bindToLua(blueprint.lua);
     }
 
+    void Project::doImport()
+    {
+        Lua& lua = blueprint.lua;
+        LuaStackSaver stk(lua);
 
+        /////////////////////////////////////////
+        //  If there is a pre-import callback... call it
+        int top = lua_gettop(lua);
+        int params = doCallback("pre-import",0,LUA_MULTRET);
+
+        try
+        {
+            //  Call each section's import function
+            for(auto& x : blueprint.sections)
+            {
+                LuaStackSaver loopstk(lua);
+
+                for(int i = 0; i < params; ++i)         lua_pushvalue(lua, top+i);
+                doCallback(x.importFunc.c_str(), params, 0);
+            }
+        }
+        catch(...)
+        {
+            // If an import failed, try to cleanup with the post-import callback
+            BEGIN_SAFE
+            doCallback("post-import", params, 0);
+            END_SAFE
+            throw;
+        }
+
+        /////////////////////////////////////
+        //  Call the post-import if there is one
+        doCallback("post-import", params, 0);
+    }
+
+    bool Project::doSave()
+    {
+        BEGIN_SAFE
+
+            // TODO
+
+        END_SAFE
+        return false;
+    }
 }

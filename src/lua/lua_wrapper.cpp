@@ -120,7 +120,14 @@ namespace lsh
         //  TODO figure out the message handler
         //    and in fact, figure out all of this!!!
 
-        return lua_pcall(L, nparams, nrets, 0);
+        int expectedZero = lua_gettop(L) - nparams - 1;
+        if(expectedZero < 0)
+            throw Error("Internal Error:  Not enough values pushed to the stack in Lua::callFunction");
+
+        int err = lua_pcall( L, nparams, nrets, 0 );
+        // TODO check the error result
+
+        return lua_gettop(L) - expectedZero;
     }
 
 }

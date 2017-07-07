@@ -16,6 +16,8 @@ namespace lsh
     public:
         LuschApp(QWidget *parent = Q_NULLPTR);
 
+        bool promptIfDirty(const char* prompt);
+
     private:
         QMainWindow*        editorHost;
 
@@ -54,6 +56,11 @@ namespace lsh
         void        loadCommonFileNames();
         void        loadProgramSettings();
         void        saveProgramSettings();
+
+        
+        bool        fileDialog_Blueprint(FileName& bpAbsolute, FileName& bpRelative);
+        bool        fileDialog_Project(FileName& path);
+        bool        dialog_ProjectFiles(Project& prj) { return false; }      // TODO fill this in
     };
 
 }

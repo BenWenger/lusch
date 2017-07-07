@@ -1,0 +1,8 @@
+
+"callbacks" section in the blueprint json:
+
+"pre-import" = function called before any import.  The return values are passed to each import function
+"pre-export" = function called before any export.  The return values are passed to each export function
+"post-import" = function called after any import.  The parameters it takes are the same as the parameters each import function takes
+"post-export" = same, but for exports
+

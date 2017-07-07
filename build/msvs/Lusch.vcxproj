@@ -25,9 +25,6 @@
     <ClCompile Include="..\..\src\main.cpp" />
     <ClCompile Include="..\..\src\util\dirtraverser_qdir.cpp" />
     <ClCompile Include="..\..\src\util\filename.cpp" />
-    <ClCompile Include="GeneratedFiles\Debug\moc_blueprint.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_editortreemodel.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
@@ -42,9 +39,6 @@
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_projectdata.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_blueprint.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_editortreemodel.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -79,14 +73,18 @@
     <ClInclude Include="..\..\src\util\safecall.h" />
     <ClInclude Include="..\..\src\versioninfo.h" />
     <CustomBuild Include="..\..\src\core\blueprint.h">
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing blueprint.h...</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DWIN64 -DPICOJSON_USE_INT64 -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB  "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtWidgets"</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Moc%27ing blueprint.h...</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DWIN64 -DPICOJSON_USE_INT64 -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB  "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtWidgets"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </Command>
     </CustomBuild>
     <ClInclude Include="..\..\src\core\fileinfo.h" />
     <CustomBuild Include="..\..\src\core\project.h">

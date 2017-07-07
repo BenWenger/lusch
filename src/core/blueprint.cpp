@@ -1,15 +1,27 @@
 
-#include <QFileInfo>
 #include "error.h"
 #include "blueprint.h"
 #include "util/dirtraverser_qdir.h"
 #include "util/qtjson.h"
 #include "log.h"
 #include <set>
+#include <unordered_set>
 #include "fileinfo.h"
 
 namespace lsh
 {
+    namespace
+    {
+        const std::unordered_set<std::string> recognized_callback_names =
+        {
+            "pre-import",
+            "pre-export",
+            "post-import",
+            "post-export",
+        };
+    }
+
+
     void Blueprint::transferFromAnotherObject(Blueprint&& rhs)
     {
         luschVersion        = std::move(rhs.luschVersion);
@@ -28,17 +40,13 @@ namespace lsh
         // TODO - emit a signal?
     }
 
-    void Blueprint::load(const QString& filename)
+    void Blueprint::load(const FileName& filename)
     {
-        QFileInfo inf(filename);
-        if(!inf.exists())
-            throw Error("Blueprint file '" + filename + "' does not exist.");
-
-        QString ext = inf.suffix().toLower();
+        QString ext = QString::fromStdString( filename.getExt() ).toLower();
         
-        if     (ext == "json")                  doLoad( DirTraverser_QDir(inf.canonicalPath()) );
+        if     (ext == "json")                  doLoad( DirTraverser_QDir( QString::fromStdString(filename.getFullPath(true))  ));
         else if(ext == "lshbp" || ext == "zip") throw Error("Internal error - zip files not yet supported");
-        else                                    throw Error("Blueprint file '" + filename + "' has unrecognized extension");
+        else                                    throw Error("Blueprint file '" + filename.getFullPath() + "' has unrecognized extension");
     }
 
     void Blueprint::doLoad(DirTraverser& dir)
@@ -117,6 +125,32 @@ namespace lsh
                 }
             }
         }
+
+        // And the "callbacks"
+        i = dat.find("callbacks");
+        if(i != dat.end())
+        {
+            if(!i->second.is<json::object>())   throw Error("Blueprint 'callbacks' entry is not an object");
+            auto& x = i->second.get<json::object>();
+            for(auto& item : x)
+            {
+                //  Is this callback a recognized name?
+                if( recognized_callback_names.find( item.first ) == recognized_callback_names.end() )
+                {
+                    Log::wrn("In blueprint, ignoring unrecognized callback '" + item.first + "'");
+                    continue;
+                }
+
+                // Is the value a string?
+                if( !item.second.is<std::string>() )
+                {
+                    Log::wrn("In blueprint, ignoring callback '" + item.first + "' because it does not have a string value.");
+                    continue;
+                }
+
+                callbacks[item.first] = item.second.get<std::string>();
+            }
+        }
     }
 
     Blueprint::SectionInfo Blueprint::loadSectionInfoFromJson(const json::object& info)
@@ -173,6 +207,8 @@ namespace lsh
     {
         //  Step 1, load the index file
         loadIndexFile(dir);
+
+        // TODO finish this
     }
 
 }

@@ -4,6 +4,14 @@
 
 namespace lsh
 {
+    void FileName::clear()
+    {
+        volume.clear();
+        path.clear();
+        title.clear();
+        ext.clear();
+    }
+
     FileName::FileName(const std::string& fullpath)
     {
         setFullPath(fullpath);

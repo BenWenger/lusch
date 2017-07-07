@@ -14,7 +14,7 @@ namespace lsh
 
     ///////////////////////////////////////////////////////
 
-    int LuaIOFile::openForLua(Lua& lua, const std::string& filepath, const FileFlags& modeinfo)
+    int LuaIOFile::openForLua(Lua& lua, const std::string& filepath, const FileFlags& modeinfo, bool mustopen)
     {
         int qmode = modeinfo.binary ? 0 : QIODevice::Text;
         if(modeinfo.read)           qmode |= QIODevice::ReadOnly;
@@ -30,6 +30,8 @@ namespace lsh
             outfile->pushToLua(lua);
             return 1;
         }
+        else if(mustopen)
+            throw Error("Unable to open file '" + filepath);
         else
         {
             // TODO log error message ??  or push it ??

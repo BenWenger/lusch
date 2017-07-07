@@ -23,5 +23,12 @@
     "sections":
     [
         { "name": "Armor Stats",        "import": "importArmor",        "export": "exportArmor"       }
-    ]
+    ],
+    "callbacks":
+    {
+        "pre-import":   "preImport",
+        "pre-export":   "preExport",
+        "post-import":  "postImExport",
+        "post-import":  "postImExport"
+    }
 }

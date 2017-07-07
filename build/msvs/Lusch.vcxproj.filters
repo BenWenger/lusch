@@ -79,12 +79,6 @@
     <ClCompile Include="..\..\src\util\dirtraverser_qdir.cpp">
       <Filter>src\util</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_blueprint.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_blueprint.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_projectdata.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>

@@ -8,6 +8,7 @@
 #include <QMessageBox>
 #include <QCloseEvent>
 #include <QCoreApplication>
+#include <QMessageBox>
 
 
 #include <QFileInfo>
@@ -53,13 +54,6 @@ namespace lsh
         */
     }
 
-#define MENU(str, code, func)     \
-{   auto act = new QAction(str, this);      \
-    act->setShortcut( Qt::Key_##code | Qt::CTRL ); \
-    connect( act, &QAction::triggered, this, &LuschApp::func ); \
-    fmenu->addAction(act);          }
-
-
     LuschApp::LuschApp(QWidget *parent)
         : QMainWindow(parent)
     {
@@ -89,68 +83,6 @@ namespace lsh
         dock_editortree->setWidget(treeview);
         addDockWidget(Qt::LeftDockWidgetArea, dock_editortree);
 
-
-        ///////////////////////////////
-        //  Temporary menu
-        /*
-        auto menubar = menuBar();
-        auto fmenu = menubar->addMenu("&Temp");
-        
-        MENU( "Debug\tCtrl+1", 1, onDbg );
-        MENU( "Info\tCtrl+2", 2, onInf );
-        MENU( "Warning\tCtrl+3", 3, onWrn );
-        MENU( "Error\tCtrl+4", 4, onErr );
-        */
-        /*
-        auto act = new QAction("&Temp\tCtrl+T", this);
-        act->setShortcut( Qt::Key_T | Qt::CTRL );
-        connect(act, &QAction::triggered, this, &LuschApp::onTemp);
-
-        fmenu->addAction(act);
-        */
-    /*
-        subwindow->setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::North);
-        setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::North);
-    */
-        /*
-        QToolBar* bar = addToolBar("TB 1");
-        bar->addAction("B 1");
-
-        bar = addToolBar("TB 2");
-        bar->addAction("B 2");
-    
-        bar = addToolBar("TB 3");
-        bar->addAction("B 3");*/
-        /*
-        QTextEdit* txt = new QTextEdit(this);
-        setCentralWidget(txt);
-        */
-    /*
-        QDockWidget* dk = new QDockWidget("Dock 1", this);
-        dk->setAllowedAreas(Qt::AllDockWidgetAreas);
-        addDockWidget(Qt::LeftDockWidgetArea, dk);
-    
-        QDockWidget* dk2 = new QDockWidget("Dock 2", this);
-        dk2->setAllowedAreas(Qt::AllDockWidgetAreas);
-        addDockWidget(Qt::TopDockWidgetArea, dk2);
-    
-        QDockWidget* dk3 = new QDockWidget("Dock 3", this);
-        dk3->setAllowedAreas(Qt::AllDockWidgetAreas);
-        addDockWidget(Qt::RightDockWidgetArea, dk3);
-
-    
-        QDockWidget* idk = new QDockWidget("I Dock 1", this);
-        idk->setAllowedAreas(Qt::AllDockWidgetAreas);
-        subwindow->addDockWidget(Qt::LeftDockWidgetArea, idk);
-    
-        QDockWidget* idk2 = new QDockWidget("I Dock 2", this);
-        idk2->setAllowedAreas(Qt::AllDockWidgetAreas);
-        subwindow->addDockWidget(Qt::TopDockWidgetArea, idk2);
-    
-        QDockWidget* idk3 = new QDockWidget("I Dock 3", this);
-        idk3->setAllowedAreas(Qt::AllDockWidgetAreas);
-        subwindow->addDockWidget(Qt::RightDockWidgetArea, idk3);
-        */
         
         setGeometry(100, 100, 1200, 600);     // TODO this is temporary
         loadProgramSettings();
@@ -185,7 +117,45 @@ namespace lsh
         actSaveProject->setEnabled(false);
     }
 
-    void LuschApp::onNewProject()       { /* TODO   */  }
+    void LuschApp::onNewProject()
+    {
+        BEGIN_SAFE
+
+        // A new project will close our current project.  See if the user wants to save first
+        if( !promptIfDirty("Save changes before creating a new project?") )
+            return;
+        
+        //  Select a blueprint, and load it
+        FileName    bpAbs, bpRel;                               // absolute and relative paths
+        if(!fileDialog_Blueprint(bpAbs, bpRel))                 return;
+        Blueprint bp;
+        bp.load(bpAbs);
+
+
+        //  Select a project, bind it to the blueprint
+        FileName    projectPath;
+        if(!fileDialog_Project(projectPath))                    return;
+
+        Project pj;
+        pj.newProject( projectPath, bpRel, std::move(bp) );
+
+        //  Have the user select the files for the project
+        if(!dialog_ProjectFiles(pj))                            return;
+
+        //  At this point, project and blueprint are complete enough to be usable.
+        project = std::move(pj);
+
+        //  Lastly, do a proper import -- This is OK to fail
+            BEGIN_SAFE
+            project.doImport();
+            END_SAFE
+        
+        // Now that everything is done, save the project file
+        project.doSave();
+
+        END_SAFE
+    }
+
     void LuschApp::onOpenProject()      { /* TODO   */  }
     void LuschApp::onSaveProject()      { /* TODO   */  }
 
@@ -193,12 +163,31 @@ namespace lsh
     {
         BEGIN_SAFE
 
-        if( !project.promptIfDirty( this, "Save changes to project before exiting?" ) )
+        if( !promptIfDirty( "Save changes to project before exiting?" ) )
             evt->ignore();
         else
             saveProgramSettings();
 
         END_SAFE
+    }
+
+    bool LuschApp::promptIfDirty(const char* prompt)
+    {
+        if(!project.isDirty())
+            return true;
+
+        auto answer = QMessageBox::warning(this, "Are you sure?", prompt,
+                                           QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
+                                           QMessageBox::Yes );
+
+        switch(answer)
+        {
+        case QMessageBox::No:       return true;
+        case QMessageBox::Yes:      /* TODO save */ break;
+        default:                    return false;
+        }
+
+        return !project.isDirty();
     }
 
     
@@ -247,4 +236,48 @@ namespace lsh
         catch(...){}
     }
 
+    /////////////////////////////////////////////////////////
+
+    bool LuschApp::fileDialog_Blueprint(FileName& bpAbsolute, FileName& bpRelative)
+    {
+        FileName root = settings.blueprintDir;
+        root.makeAbsoluteWith( exeFileName );
+
+        auto x = QFileDialog::getOpenFileName(this, tr("Choose a blueprint for this project."),
+                                              QString::fromStdString(root.getFullPath(true)),
+                                              tr("Lusch blueprint files (index.json)")
+                                             );
+        if(x.isEmpty())
+            return false;
+        bpAbsolute = x.toStdString();
+        bpRelative = bpAbsolute;
+        bpRelative.makeRelativeTo( bpAbsolute );
+        if(bpRelative.beginsWithDoubleDot() || bpRelative.isAbsolute())            // is this not in the "blueprints" directory?
+        {
+            auto answer = QMessageBox::warning(this, "Blueprint not in expected directory",
+                                           "This blueprint is not in Lusch's blueprint directory.  This will work, but is not recommended.  Are you sure you want to continue with this blueprint?",
+                                           QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
+                                           QMessageBox::Yes );
+            if(answer != QMessageBox::Yes)      return false;
+        }
+
+        return true;
+    }
+    
+    bool LuschApp::fileDialog_Project(FileName& path)
+    {
+        //////////////////////////////////////////////
+        // Next, select a project path.  Default this directory to the last directory a project file was accessed from
+        auto x = QFileDialog::getSaveFileName(this, tr("Choose a location to save your project."),
+                                              QString::fromStdString(settings.lastProjectDir.getFullPath(true)),
+                                              tr("Lusch project files (*.lshpj)")
+                                             );
+
+        if(x.isEmpty())
+            return false;
+        path = x.toStdString();
+        settings.lastProjectDir.setPathOnly(path.getPathOnly());
+
+        return true;
+    }
 }
