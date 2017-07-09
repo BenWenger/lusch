@@ -80,14 +80,14 @@ namespace lsh
             {                
                 Lua* lua = Lua::fromLuaState(L);
                 if(!lua)                                    throw Error("In launch function, null pointer for Lua object obtained");
-
-                auto i = globalMap.find(name);
-                if(i == globalMap.end())                    throw Error("In launch function, bad function name given (name not in registry)");
-                auto func = i->second;
                 
                 int upindex = lua_upvalueindex(1);          // get the index of the upvalue (function name)
                 if(lua_type(L, upindex) != LUA_TSTRING)     throw Error("In launch function, Lua upvalue was not a string");
                 name = lua_tostring(L, upindex);
+                
+                auto i = globalMap.find(name);
+                if(i == globalMap.end())                    throw Error("In launch function, bad function name given (name not in registry)");
+                auto func = i->second;
 
                 // Global functions:  don't need anything extra
 
@@ -109,14 +109,14 @@ namespace lsh
             {                
                 Lua* lua = Lua::fromLuaState(L);
                 if(!lua)                                    throw Error("In launch function, null pointer for Lua object obtained");
-
-                auto i = Hack<T>::memberMap.find(name);
-                if(i == Hack<T>::memberMap.end())           throw Error("In launch function, bad function name given (name not in registry)");
-                auto func = i->second;
                 
                 int upindex = lua_upvalueindex(1);          // get the index of the upvalue (function name)
                 if(lua_type(L, upindex) != LUA_TSTRING)     throw Error("In launch function, Lua upvalue was not a string");
                 name = lua_tostring(L, upindex);
+                
+                auto i = Hack<T>::memberMap.find(name);
+                if(i == Hack<T>::memberMap.end())           throw Error("In launch function, bad function name given (name not in registry)");
+                auto func = i->second;
 
                 //  For member functions, the object pointer is the first parameter
                 auto obj = T::getPointerFromLuaStack(*lua, 1, "parameter 1");
@@ -140,13 +140,13 @@ namespace lsh
                 Lua* lua = Lua::fromLuaState(L);
                 if(!lua)                                    throw Error("In launch function, null pointer for Lua object obtained");
 
-                auto i = Hack<T>::boundedMap.find(name);
-                if(i == Hack<T>::boundedMap.end())          throw Error("In launch function, bad function name given (name not in registry)");
-                auto func = i->second;
-                
                 int upindex = lua_upvalueindex(1);          // get the index of the upvalue (function name)
                 if(lua_type(L, upindex) != LUA_TSTRING)     throw Error("In launch function, Lua upvalue was not a string");
                 name = lua_tostring(L, upindex);
+                
+                auto i = Hack<T>::boundedMap.find(name);
+                if(i == Hack<T>::boundedMap.end())          throw Error("In launch function, bad function name given (name not in registry)");
+                auto func = i->second;
 
                 //  For bounded functions, the object pointer comes from the lua_State
                 T* obj = T::fromLuaState(L);

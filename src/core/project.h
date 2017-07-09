@@ -51,6 +51,7 @@ namespace lsh
 
         FileName    translateFileName(const std::string& name, bool& waswritable);
         void        bindToLua(Lua& lua);
+        void        populateFileInfoIndexes();
 
         bool                loaded = false;
         bool                dirty = false;

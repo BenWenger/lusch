@@ -16,10 +16,10 @@ importArmor = function(file)
         id = string.format("%d", i)
         evade, absorb, element, spell = file:read(4):byte(1,4)
 
-        lsh.set( "armor.evade."..id, i),    evade )
-        lsh.set( "armor.absorb."..id, i),   absorb )
-        lsh.set( "armor.element."..id, i),  element )
-        lsh.set( "armor.spell."..id, i),    spell )
+        lsh.set( "armor.evade."..id,    evade )
+        lsh.set( "armor.absorb."..id,   absorb )
+        lsh.set( "armor.element."..id,  element )
+        lsh.set( "armor.spell."..id,    spell )
     end
 end
 
@@ -29,10 +29,10 @@ exportArmor = function(file)
     
     for i=0, armor_pieceCount-1 do
         id = string.format("%d", i)
-        evade =     lsh.get( "armor.evade."..id, i) )
-        absorb =    lsh.get( "armor.absorb."..id, i) )
-        element =   lsh.get( "armor.element."..id, i) )
-        spell =     lsh.get( "armor.spell."..id, i) )
+        evade =     lsh.get( "armor.evade."..id )
+        absorb =    lsh.get( "armor.absorb."..id )
+        element =   lsh.get( "armor.element."..id )
+        spell =     lsh.get( "armor.spell."..id )
         
         file:write( string.char( evade, absorb, element, spell ) )
     end

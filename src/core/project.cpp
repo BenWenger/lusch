@@ -281,11 +281,22 @@ namespace lsh
     //////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////
+
+    void Project::populateFileInfoIndexes()
+    {
+        fileInfoIndexes.clear();
+
+        auto& filelist = blueprint.files;
+        auto size = filelist.size();
+
+        for(std::size_t i = 0; i < size; ++i)
+        {
+            fileInfoIndexes[ filelist[i].id ] = i;
+        }
+    }
     
     int Project::doCallback(const char* callback_name, int params, int rets)
     {
-        LuaStackSaver stk(blueprint.lua, -params);
-
         auto& x = blueprint.callbacks.find(callback_name);
         if(x != blueprint.callbacks.end())
         {
@@ -315,10 +326,12 @@ namespace lsh
         }
 
         bindToLua(blueprint.lua);
+        populateFileInfoIndexes();
     }
 
     void Project::doImport()
     {
+        Log::inf( "--- Performing import ---" );
         Lua& lua = blueprint.lua;
         LuaStackSaver stk(lua);
 
@@ -326,6 +339,7 @@ namespace lsh
         //  If there is a pre-import callback... call it
         int top = lua_gettop(lua);
         int params = doCallback("pre-import",0,LUA_MULTRET);
+        int top2 = lua_gettop(lua);
 
         //  [Safe] Call each section's import function
         for(auto& x : blueprint.sections)
@@ -337,6 +351,7 @@ namespace lsh
             lua.callGlobalFunction(x.importFunc.c_str(), params, 0);
             END_SAFE
         }
+        int top3 = lua_gettop(lua);
 
         /////////////////////////////////////
         //  Call the post-import if there is one

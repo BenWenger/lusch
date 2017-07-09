@@ -97,6 +97,7 @@ namespace lsh
         inline void     assertActive() { if(!L) throw Error("Internal Error:  Lua object used after state was moved");  }
 
         
+        void            handleLuaError(int code);
 
         /////////////////////////////////////
         //  Defined in lua_wrapper_environment.cpp

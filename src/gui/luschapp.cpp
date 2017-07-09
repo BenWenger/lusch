@@ -123,6 +123,8 @@ namespace lsh
     {
         BEGIN_SAFE
 
+        Log::inf("\nCreating a new project...");
+
         // A new project will close our current project.  See if the user wants to save first
         if( !promptIfDirty("Save changes before creating a new project?") )
             return;
@@ -154,6 +156,8 @@ namespace lsh
         
         // Now that everything is done, save the project file
         project.doSave();
+
+        Log::inf("New project creation complete\n\n");
 
         END_SAFE
     }

@@ -15,6 +15,13 @@ namespace lsh
     class LuaStackSaver
     {
     public:
+        LuaStackSaver(int rawsize, lua_State* x)
+        {
+            L = x;
+            if(L)       stk = rawsize;
+            else        stk = 0;
+        }
+
         LuaStackSaver(lua_State* x, int adj = 0)
         {
             L = x;

@@ -7,6 +7,7 @@
 #include <set>
 #include <unordered_set>
 #include "fileinfo.h"
+#include "lua/lua_stacksaver.h"
 
 namespace lsh
 {
@@ -195,6 +196,8 @@ namespace lsh
 
     Blueprint::Blueprint(DirTraverser& dir)
     {
+        Log::inf( "--- Loading blueprint ---" );
+
         //  Step 1, load the index file
         loadIndexFile(dir);
 
@@ -204,6 +207,8 @@ namespace lsh
             //  Lua files
             if(dir.getExt() == "lua")
             {
+                LuaStackSaver stk(lua);
+
                 auto file = dir.openFile(dir.getName(), false);
                 lua.loadScript( *file, dir.getName().toStdString().c_str() );
             }

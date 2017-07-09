@@ -116,19 +116,40 @@ namespace lsh
         
     //////////////////////////////////////////////////
     //////////////////////////////////////////////////
+
+    namespace
+    {
+        int luaMessageHandler(lua_State* L)
+        {
+            luaL_traceback( L, L, lua_tostring(L, -1), 1);
+            return 1;
+        }
+    }
     
     int Lua::callFunction(int nparams, int nrets)
     {
-        //  TODO figure out the message handler
-        //    and in fact, figure out all of this!!!
+        if(lua_type(L, -1) != LUA_TFUNCTION)
+            throw Error("Internal Error:  Lua::callFunction is called without having a function on the top of the stack.");
 
         int expectedZero = lua_gettop(L) - nparams - 1;
         if(expectedZero < 0)
             throw Error("Internal Error:  Not enough values pushed to the stack in Lua::callFunction");
+        
+        LuaStackSaver stk(expectedZero, L);
 
-        int err = lua_pcall( L, nparams, nrets, 0 );
-        // TODO check the error result
+        /*
+        int msgh = expectedZero + 1;
 
+        lua_pushcfunction( L, &luaMessageHandler );             // cram the message handler in there
+        lua_insert( L, msgh );
+
+        handleLuaError( lua_pcall( L, nparams, nrets, msgh ) );
+
+        lua_remove( L, msgh );                                  // remove the message handler
+        */
+        handleLuaError( lua_pcall( L, nparams, nrets, 0 ) );
+
+        stk.escape();
         return lua_gettop(L) - expectedZero;
     }
 
@@ -186,9 +207,31 @@ namespace lsh
 
     void Lua::loadScript(QIODevice& file, const char* filename)
     {
-        int result = LuaReader::go(L, file, filename);
+        LuaStackSaver stk(L);
 
-        // TODO handle error result
+
+        handleLuaError( LuaReader::go(L, file, filename) );
+        callFunction(0,0);
+    }
+
+    void Lua::handleLuaError(int code)
+    {
+        if(code == LUA_OK)      return;
+        if(code == LUA_ERRMEM)  throw std::bad_alloc();
+
+        std::string msg = "<No error message provided by Lua>";
+        if(lua_isstring(L, -1))
+            msg = lua_tostring(L, -1);
+
+        switch(code)
+        {
+        case LUA_ERRSYNTAX:     throw Error( "Lua Syntax Error:  " + msg );
+        case LUA_ERRGCMM:       throw Error( "Internal error occurred during Lua garbage collection:  " + msg );
+        case LUA_ERRRUN:        throw Error( "Lua Error:  " + msg );
+        case LUA_ERRERR:        throw Error( "Internal error occurred during message handler:  " + msg );
+        }
+
+        throw Error( "Unknown error reported from Lua:  " + msg );
     }
 
 
