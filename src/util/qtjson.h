@@ -17,39 +17,36 @@ namespace json = picojson;
     much easier to modify and redistribute.
  */
 
-namespace lsh
+namespace picojson
 {
-    inline json::object loadJsonFromFile(QIODevice& file)
+    inline json::object loadFromFile(QIODevice& file)
     {
         // TODO - maybe iterate over the file in place instead of reading it into a giant buffer?
 
         auto data = file.readAll();
         if(data.isEmpty())
-            throw Error("Unknown error occurred when trying to read json file");
+            throw lsh::Error("Unknown error occurred when trying to read json file");
 
         std::string err;
         json::value output;
         json::parse( output, data.begin(), data.end(), &err );
 
         if(!err.empty())
-            throw Error(err);
+            throw lsh::Error(err);
 
         if(!output.is<json::object>())
-            throw Error("Json file does not contain a root object.");
+            throw lsh::Error("Json file does not contain a root object.");
 
         return output.get<json::object>();
     }
 
-    inline void saveJsonToFile(const json::object& obj, QIODevice& file)
+    inline void saveToFile(const json::object& obj, QIODevice& file, bool pretty)
     {
-        auto out = json::value(obj).serialize(true);
+        auto out = json::value(obj).serialize(pretty);
 
         file.write(out.c_str(), out.size());
     }
-}
 
-namespace picojson
-{
     template <typename T>
     inline T& setNew(value& v)
     {

@@ -16,6 +16,12 @@ namespace lsh
         //  Project Files
         const char* const       projectFileHeaderString = "Lusch project file";
         const char* const       projectFileVersion = "Dev pre-alpha";
+        
+        /////////////////////////////////////////////
+        //  Blueprint Files
+        const char* const       blueprintFileHeaderString = "Lusch project file";
+        const char* const       blueprintFileLuschVersion = "Dev pre-alpha";
+        const char* const       blueprintFileVersion = "Dev pre-alpha";
     }
 }
 

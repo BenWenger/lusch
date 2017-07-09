@@ -14,6 +14,8 @@
     <ClCompile Include="..\..\src\core\blueprint.cpp" />
     <ClCompile Include="..\..\src\core\programsettings.cpp" />
     <ClCompile Include="..\..\src\core\project.cpp" />
+    <ClCompile Include="..\..\src\gui\controls\filenameselector.cpp" />
+    <ClCompile Include="..\..\src\gui\dialogs\projectfilesdlg.cpp" />
     <ClCompile Include="..\..\src\gui\editortreemodel.cpp" />
     <ClCompile Include="..\..\src\gui\loggerwindow.cpp" />
     <ClCompile Include="..\..\src\gui\luschapp.cpp" />
@@ -70,6 +72,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\core\programsettings.h" />
+    <ClInclude Include="..\..\src\gui\controls\filenameselector.h" />
+    <ClInclude Include="..\..\src\gui\dialogs\projectfilesdlg.h" />
     <ClInclude Include="..\..\src\util\safecall.h" />
     <ClInclude Include="..\..\src\versioninfo.h" />
     <CustomBuild Include="..\..\src\core\blueprint.h">

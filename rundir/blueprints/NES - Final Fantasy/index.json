@@ -1,5 +1,5 @@
 {
-    "lusch header":
+    "header":
     {
         "lusch version":        "dev",
         "blueprint version":    "dev"
@@ -29,6 +29,6 @@
         "pre-import":   "preImport",
         "pre-export":   "preExport",
         "post-import":  "postImExport",
-        "post-import":  "postImExport"
+        "post-export":  "postImExport"
     }
 }

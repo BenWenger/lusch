@@ -29,6 +29,9 @@ namespace lsh
         bool        isDirty() const { return loaded && dirty; }
 
         void        newProject(const FileName& projectPath, const FileName& bpPathRelative, Blueprint&& bp);
+
+        std::vector<FileInfo>&      getFileInfoArray()          { return blueprint.files;       }
+        const FileName&             getProjectFileName() const  { return projectFileName;       }
         
         void        doImport();
         bool        doSave();
@@ -51,8 +54,8 @@ namespace lsh
 
         bool                loaded = false;
         bool                dirty = false;
-        bool                saveCompressed = true;
         bool                savePretty = true;
+        bool                saveAsTree = true;
 
         Blueprint                                       blueprint;
         FileName                                        projectFileName;
@@ -61,6 +64,9 @@ namespace lsh
         std::unordered_map<std::string, ProjectData>    dat;
         
         int         doCallback(const char* callback_name, int params, int rets);
+
+
+        json::object dataToJson() const;
     };
 
 }

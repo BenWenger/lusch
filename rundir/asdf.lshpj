@@ -1,0 +1,24 @@
+{
+  "blueprint": {
+    "name": "NES - Final Fantasy/index.json"
+  },
+  "data": {},
+  "files": {
+    "dstfile": "hack.nes",
+    "srcfile": "Final Fantasy (U) [!].nes"
+  },
+  "header": {
+    "filetype": "Lusch project file",
+    "version": "Dev pre-alpha"
+  },
+  "misc settings": {
+    "saveAsTree": true,
+    "savePretty": true
+  },
+  "sections": {
+    "Armor Stats": {
+      "toExport": true,
+      "toImport": true
+    }
+  }
+}

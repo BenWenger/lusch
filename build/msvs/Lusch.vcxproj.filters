@@ -38,6 +38,12 @@
     <Filter Include="src\lua\objects">
       <UniqueIdentifier>{1ddcdbd4-45a4-438d-800f-f30cebc4a631}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\gui\dialogs">
+      <UniqueIdentifier>{b14bccdc-57ff-4a32-a19f-7d7ea21cf834}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\gui\controls">
+      <UniqueIdentifier>{5cf69bc2-995e-47c3-9732-0c90014d0c25}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\gui\luschapp.cpp">
@@ -112,6 +118,12 @@
     <ClCompile Include="..\..\src\core\programsettings.cpp">
       <Filter>src\core</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\gui\dialogs\projectfilesdlg.cpp">
+      <Filter>src\gui\dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\gui\controls\filenameselector.cpp">
+      <Filter>src\gui\controls</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\src\gui\luschapp.h">
@@ -184,6 +196,12 @@
     </ClInclude>
     <ClInclude Include="..\..\src\versioninfo.h">
       <Filter>src\%28root%29</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\gui\dialogs\projectfilesdlg.h">
+      <Filter>src\gui\dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\gui\controls\filenameselector.h">
+      <Filter>src\gui\controls</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

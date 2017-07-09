@@ -52,8 +52,11 @@
 #include "lua_binding.h"
 #include "error.h"
 
+class QIODevice;
+
 namespace lsh
 {
+
     class Lua : public LuaBinding<Lua>
     {
     public:
@@ -71,6 +74,7 @@ namespace lsh
 
         // Calling functions!
         int             callFunction(int nparams, int nrets);
+        int             callGlobalFunction(const char* funcname, int nparams, int nrets);
 
         // String shit
         void            pushString(const std::string& str);
@@ -84,6 +88,8 @@ namespace lsh
         std::string     getStringParam(int index, const char* func_name, const std::string& defoption);
         lua_Integer     getIntParam(int index, const char* func_name);
         lua_Integer     getIntParam(int index, const char* func_name, lua_Integer defoption);
+
+        void            loadScript(QIODevice& file, const char* filename);
 
     private:
         lua_State*      L;

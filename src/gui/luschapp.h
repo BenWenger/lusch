@@ -60,7 +60,6 @@ namespace lsh
         
         bool        fileDialog_Blueprint(FileName& bpAbsolute, FileName& bpRelative);
         bool        fileDialog_Project(FileName& path);
-        bool        dialog_ProjectFiles(Project& prj) { return false; }      // TODO fill this in
     };
 
 }

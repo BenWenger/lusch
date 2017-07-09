@@ -3,6 +3,8 @@
 #include "lua_stacksaver.h"
 
 #include "objects/lua_object.h"
+#include "log.h"
+#include <QIODevice>
 
 namespace lsh
 {
@@ -129,5 +131,65 @@ namespace lsh
 
         return lua_gettop(L) - expectedZero;
     }
+
+    int Lua::callGlobalFunction(const char* funcname, int nparams, int nrets)
+    {
+        if(lua_getglobal(L, funcname) != LUA_TFUNCTION)
+        {
+            Log::wrn("'" + std::string(funcname) + "' is not a global function name.");
+        }
+        else
+        {
+            return callFunction(nparams,nrets);
+        }
+        return 0;
+    }
+
+    
+    //////////////////////////////////////////////////
+    //////////////////////////////////////////////////
+    //  File loading
+    namespace
+    {
+        class LuaReader
+        {
+        public:
+            static int go(lua_State* L, QIODevice& file, const char* filename)
+            {
+                LuaReader reader(file);
+                return lua_load(L, &LuaReader::callback, reinterpret_cast<void*>(&reader), filename, nullptr);
+            }
+
+        private:
+            static constexpr int    bufsize = 2000;
+            QIODevice&              file;
+            char                    buffer[bufsize];
+
+            LuaReader(QIODevice& f) : file(f) {}
+
+            static const char* callback(lua_State* L, void* data, std::size_t* size)
+            {
+                auto* obj = reinterpret_cast<LuaReader*>(data);
+
+                auto bytes = obj->file.read(obj->buffer, bufsize);
+                if(bytes <= 0)
+                {
+                    *size = 0;
+                    return nullptr;
+                }
+
+                *size = static_cast<std::size_t>(bytes);
+                return obj->buffer;
+            }
+        };
+    }
+
+    void Lua::loadScript(QIODevice& file, const char* filename)
+    {
+        int result = LuaReader::go(L, file, filename);
+
+        // TODO handle error result
+    }
+
 
 }

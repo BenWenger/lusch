@@ -54,7 +54,7 @@ namespace lsh
         path_t  work;
 
         // Phase 1:  look for the similar parts of the path
-        auto steps = std::max(base.path.size(), path.size());
+        auto steps = std::min(base.path.size(), path.size());
         std::size_t matching;
         for(matching = 0; (matching < steps) && (base.path[matching] == path[matching]); ++matching) {}
 
@@ -271,5 +271,15 @@ namespace lsh
         }
 
         return out;
+    }
+
+    bool FileName::isEmpty() const
+    {
+        if(!volume.empty())     return false;
+        if(!path.empty())       return false;
+        if(!title.empty())      return false;
+        if(!ext.empty())        return false;
+
+        return true;
     }
 }

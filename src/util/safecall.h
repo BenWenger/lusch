@@ -4,7 +4,7 @@
 #include "log.h"
 
 #define BEGIN_SAFE      try {
-#define END_SAFE        } catch(std::exception& e) { e.what(); }    \
+#define END_SAFE        } catch(std::exception& e) { Log::err(e.what()); }    \
                         catch(...) { Log::err("Internal Error:  Unexpected value caught during safeCall"); }
 
 

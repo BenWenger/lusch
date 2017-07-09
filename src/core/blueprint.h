@@ -46,8 +46,6 @@ namespace lsh
                     Blueprint(DirTraverser& dir);
         void        doLoad(DirTraverser& dir);
 
-        void        transferFromAnotherObject(Blueprint&& rhs);
-
         void        loadIndexFile(DirTraverser& dir);
         static FileInfo     loadFileInfoFromJson(const json::object& info);
         static SectionInfo  loadSectionInfoFromJson(const json::object& info);

@@ -26,6 +26,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+
+//  Note that I have made some minor changes to this file for Lusch
+
 #ifndef picojson_h
 #define picojson_h
 
@@ -411,7 +414,7 @@ namespace picojson {
 #define MAP(val, sym) case val: copy(sym, oi); break
 	MAP('"', "\\\"");
 	MAP('\\', "\\\\");
-	MAP('/', "\\/");
+	//MAP('/', "\\/");       This escape sequence isn't necessary for writing
 	MAP('\b', "\\b");
 	MAP('\f', "\\f");
 	MAP('\n', "\\n");

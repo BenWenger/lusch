@@ -36,6 +36,7 @@ namespace lsh
         bool makeAbsoluteWith(const FileName& base);
         bool makeRelativeTo(const FileName& base);
         bool beginsWithDoubleDot() const;
+        bool isEmpty() const;
 
         std::string     getFullPath(bool use_native_slash = false) const    { return getPathOnly(use_native_slash) + getFileName(); }
         std::string     getFileName() const;

@@ -4,6 +4,7 @@
 #include <memory>
 #include <QObject>
 #include "lua/objects/lua_object.h"
+#include "util/qtjson.h"
 
 namespace lsh
 {
@@ -27,6 +28,9 @@ namespace lsh
         bool            asBool() const              { return v_bool; }
         double          asDbl() const               { return v_dbl; }
         LuaObject::Ptr  asObj() const               { return v_obj; }
+
+        bool            shouldSaveToJson() const    { return type != Type::Null;        }       // TODO, this may change for some objects.
+        json::value     toJson() const;
         
     public slots:
         void            setNull()                   { type = Type::Null;                v_obj.reset();  emit dataChanged(this); }
@@ -47,9 +51,24 @@ namespace lsh
         double          v_dbl = 0;
         std::string     v_str;
         LuaObject::Ptr  v_obj;
-        // TODO object
-
     };
+    
+    /////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////
+    
+    inline json::value ProjectData::toJson() const
+    {
+        switch(type)
+        {
+        case Type::Bool:        return json::value( v_bool );
+        case Type::Int:         return json::value( v_int );
+        case Type::Dbl:         return json::value( v_dbl );
+        case Type::Str:         return json::value( v_str );
+        case Type::Obj:         /* TODO */      break;
+        }
+
+        return json::value();
+    }
 
 }
 

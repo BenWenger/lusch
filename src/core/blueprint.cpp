@@ -21,15 +21,6 @@ namespace lsh
         };
     }
 
-
-    void Blueprint::transferFromAnotherObject(Blueprint&& rhs)
-    {
-        luschVersion        = std::move(rhs.luschVersion);
-        blueprintVersion    = std::move(rhs.blueprintVersion);
-        files               = std::move(rhs.files);
-        sections            = std::move(rhs.sections);
-    }
-
     void Blueprint::unload()
     {
         luschVersion.clear();
@@ -44,7 +35,7 @@ namespace lsh
     {
         QString ext = QString::fromStdString( filename.getExt() ).toLower();
         
-        if     (ext == "json")                  doLoad( DirTraverser_QDir( QString::fromStdString(filename.getFullPath(true))  ));
+        if     (ext == "json")                  doLoad( DirTraverser_QDir( QString::fromStdString(filename.getPathOnly(true))  ));
         else if(ext == "lshbp" || ext == "zip") throw Error("Internal error - zip files not yet supported");
         else                                    throw Error("Blueprint file '" + filename.getFullPath() + "' has unrecognized extension");
     }
@@ -52,8 +43,7 @@ namespace lsh
     void Blueprint::doLoad(DirTraverser& dir)
     {
         Blueprint newobj(dir);
-        transferFromAnotherObject(std::move(newobj));
-        // TODO - emit a signal?
+        *this = std::move(newobj);
     }
 
     void Blueprint::loadIndexFile(DirTraverser& dir)
@@ -61,11 +51,11 @@ namespace lsh
         auto file = dir.openFile("index.json", false);
         if(!file->isOpen())                     throw Error("Blueprint does not contain an 'index.json' file or the file was unable to be opened.");
 
-        auto dat = loadJsonFromFile(*file);
+        auto dat = json::loadFromFile(*file);
 
         // Now that we have the parsed json -- load the primary header
-        auto i = dat.find("lusch header");
-        if(i == dat.end())                      throw Error("Blueprint does not contain a 'lusch header' entry");
+        auto i = dat.find("header");
+        if(i == dat.end())                      throw Error("Blueprint does not contain a 'header' entry");
         if(!i->second.is<json::object>())       throw Error("Blueprint 'lusch header' entry is not an object");
         else
         {
@@ -208,7 +198,18 @@ namespace lsh
         //  Step 1, load the index file
         loadIndexFile(dir);
 
-        // TODO finish this
+        //  Step 2, iterate over all other files and load them as appropriate
+        while(dir.next())
+        {
+            //  Lua files
+            if(dir.getExt() == "lua")
+            {
+                auto file = dir.openFile(dir.getName(), false);
+                lua.loadScript( *file, dir.getName().toStdString().c_str() );
+            }
+
+            // TODO other kinds of files
+        }
     }
 
 }

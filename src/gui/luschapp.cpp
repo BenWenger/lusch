@@ -18,6 +18,8 @@
 #include "util/filename.h"
 #include "util/safecall.h"
 
+#include "gui/dialogs/projectfilesdlg.h"
+
 
 namespace lsh
 {
@@ -140,7 +142,7 @@ namespace lsh
         pj.newProject( projectPath, bpRel, std::move(bp) );
 
         //  Have the user select the files for the project
-        if(!dialog_ProjectFiles(pj))                            return;
+        if(!ProjectFilesDlg::go(this,pj))                       return;
 
         //  At this point, project and blueprint are complete enough to be usable.
         project = std::move(pj);
@@ -183,11 +185,11 @@ namespace lsh
         switch(answer)
         {
         case QMessageBox::No:       return true;
-        case QMessageBox::Yes:      /* TODO save */ break;
+        case QMessageBox::Yes:      return project.doSave();
         default:                    return false;
         }
 
-        return !project.isDirty();
+        return false    ;      // should never reach
     }
 
     
@@ -209,7 +211,7 @@ namespace lsh
             QFile file;
             file.setFileName( QString::fromStdString( programSettingsFileName.getFullPath(true) ) );
             if( file.open(QIODevice::ReadOnly | QIODevice::Text) )
-                settings.fromJson( loadJsonFromFile(file) );
+                settings.fromJson( json::loadFromFile(file) );
             ////////////////////////////////////////
             
             restoreGeometry(settings.mainWindowGeometry);
@@ -231,7 +233,7 @@ namespace lsh
             QFile file;
             file.setFileName( QString::fromStdString( programSettingsFileName.getFullPath(true) ) );
             if( file.open(QIODevice::WriteOnly | QIODevice::Truncate) )
-                saveJsonToFile(obj, file);
+                json::saveToFile(obj, file, true);
         }
         catch(...){}
     }
@@ -251,7 +253,7 @@ namespace lsh
             return false;
         bpAbsolute = x.toStdString();
         bpRelative = bpAbsolute;
-        bpRelative.makeRelativeTo( bpAbsolute );
+        bpRelative.makeRelativeTo( root );
         if(bpRelative.beginsWithDoubleDot() || bpRelative.isAbsolute())            // is this not in the "blueprints" directory?
         {
             auto answer = QMessageBox::warning(this, "Blueprint not in expected directory",

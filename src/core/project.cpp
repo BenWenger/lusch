@@ -39,7 +39,7 @@ namespace lsh
         loaded =                rhs.loaded;
         dirty =                 rhs.dirty;
         savePretty =            rhs.savePretty;
-        saveCompressed =        rhs.saveCompressed;
+        saveAsTree =            rhs.saveAsTree;
 
         // TODO - need to emit a signal that causes all project data ties to be rebound.
 
@@ -127,7 +127,8 @@ namespace lsh
         {
             // Directory
             if(!item.directory)             throw Error("File ID '" + id + "' is a file, not a directory.  You cannot use a slash (/) when accessing this file.");
-            FileName base = item.fileName;
+            FileName base;
+            base.setPathOnly(item.fileName.getFullPath());      // set as path only
             base.makeAbsoluteWith( projectFileName );
 
             out.setFullPath( givenname.substr(slsh+1) );
@@ -203,6 +204,78 @@ namespace lsh
 
         return 1;
     }
+    //////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////
+
+    namespace
+    {
+        json::value& findTargetJsonObjectInTree(json::object& obj, std::string& name, const std::string& fullname)
+        {
+            auto pos = name.find('.');
+            if(pos == name.npos)
+            {
+                auto& field = obj[name];
+                if(!field.is<json::null>())
+                {
+                    throw Error("Error when attempting to save project file!  When serializing '" + fullname + "', data with the name '" + name + "' already exists (possibly as a tree)!  To save the project, disable 'Save as Tree' option in the project settings and try again.");
+                }
+
+                return field;
+            }
+            else
+            {
+                auto fieldname = name.substr(0, pos);
+                name = name.substr(pos+1);
+
+                auto& field = obj[fieldname];
+                if(field.is<json::null>())      field = json::value(json::object());
+
+                if(!field.is<json::object>())
+                {
+                    if(!field.is<json::null>())
+                    {
+                        throw Error("Error when attempting to save project file!  When serializing '" + fullname + "', data with the name '" + fieldname + "' already exists!  To save the project, disable 'Save as Tree' option in the project settings and try again.");
+                    }
+
+                    field = json::value( json::object() );
+                }
+
+                return findTargetJsonObjectInTree(field.get<json::object>(), name, fullname);
+            }
+        }
+    }
+
+    json::object Project::dataToJson() const
+    {
+        json::object obj;
+
+        if(saveAsTree)
+        {
+            std::string name;
+
+            for(auto& i : dat)
+            {
+                if(!i.second.shouldSaveToJson())
+                    continue;
+
+                name = i.first;
+                auto& value = findTargetJsonObjectInTree(obj, name, i.first);
+                value = i.second.toJson();
+            }
+        }
+        else
+        {
+            for(auto& i : dat)
+            {
+                if(!i.second.shouldSaveToJson())
+                    continue;
+                obj[i.first] = i.second.toJson();
+            }
+        }
+
+        return obj;
+    }
 
     
     //////////////////////////////////////////////////////////////////
@@ -216,14 +289,7 @@ namespace lsh
         auto& x = blueprint.callbacks.find(callback_name);
         if(x != blueprint.callbacks.end())
         {
-            if(lua_getglobal(blueprint.lua, x->second.c_str()) != LUA_TFUNCTION)
-            {
-                Log::wrn("'" + std::string(callback_name) + "' is not a global function name.");
-            }
-            else
-            {
-                return blueprint.lua.callFunction(0,rets);
-            }
+            return blueprint.lua.callGlobalFunction(x->second.c_str(), params, rets);
         }
 
         return 0;
@@ -261,24 +327,15 @@ namespace lsh
         int top = lua_gettop(lua);
         int params = doCallback("pre-import",0,LUA_MULTRET);
 
-        try
+        //  [Safe] Call each section's import function
+        for(auto& x : blueprint.sections)
         {
-            //  Call each section's import function
-            for(auto& x : blueprint.sections)
-            {
-                LuaStackSaver loopstk(lua);
+            LuaStackSaver loopstk(lua);
 
-                for(int i = 0; i < params; ++i)         lua_pushvalue(lua, top+i);
-                doCallback(x.importFunc.c_str(), params, 0);
-            }
-        }
-        catch(...)
-        {
-            // If an import failed, try to cleanup with the post-import callback
             BEGIN_SAFE
-            doCallback("post-import", params, 0);
+            for(int i = 0; i < params; ++i)         lua_pushvalue(lua, top+i);
+            lua.callGlobalFunction(x.importFunc.c_str(), params, 0);
             END_SAFE
-            throw;
         }
 
         /////////////////////////////////////
@@ -289,9 +346,64 @@ namespace lsh
     bool Project::doSave()
     {
         BEGIN_SAFE
+            //////////////////////////////////////////////
+            //  Build the json value
 
-            // TODO
+            json::value jsonData;
+            auto& mainobj = json::setNew<json::object>(jsonData);
 
+            {
+                auto& blk = json::setNew<json::object>(mainobj["header"]);
+                blk["filetype"] = json::value( projectFileHeaderString );
+                blk["version"]  = json::value( projectFileVersion      );
+            }
+            {
+                auto& blk = json::setNew<json::object>(mainobj["misc settings"]);
+                blk["savePretty"]     = json::value(savePretty);
+                blk["saveAsTree"]     = json::value(saveAsTree);
+            }
+            {
+                auto& blk = json::setNew<json::object>(mainobj["blueprint"]);
+                blk["name"] = json::value( bpFileName.getFullPath() );
+                //  TODO - record blueprint version?
+            }
+            {
+                auto& blk = json::setNew<json::object>(mainobj["files"]);
+                for(auto& x : blueprint.files)
+                {
+                    blk[x.id] = json::value( x.fileName.getFullPath() );
+                }
+            }
+            {
+                auto& blk = json::setNew<json::object>(mainobj["sections"]);
+                for(auto& x : blueprint.sections)
+                {
+                    auto& i = json::setNew<json::object>(blk[x.id]);
+                    i["toImport"] = json::value( x.toImport );
+                    i["toExport"] = json::value( x.toExport );
+                }
+            }
+            {
+                mainobj["data"] = json::value( dataToJson() );
+            }
+
+            ///////////////////////////////////////////////////
+            //  Actually save it to the file
+
+            // TODO -- compress??
+
+            QFile file;
+            QString path = QString::fromStdString( projectFileName.getFullPath(true) );
+            file.setFileName( path );
+            if( !file.open( QIODevice::Truncate | QIODevice::WriteOnly ) )
+                throw Error( "Unable to open file '" + path + "' for writing" );
+
+            json::saveToFile(mainobj, file, savePretty);
+
+            dirty = false;                  // project is no longer dirty (we just saved it)
+            emit projectStateChanged();     // which means we also want to emit the event to indicate dirty state changed
+
+            return true;
         END_SAFE
         return false;
     }
