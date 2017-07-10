@@ -74,7 +74,7 @@ namespace lsh
 
         // Calling functions!
         int             callFunction(int nparams, int nrets);
-        int             callGlobalFunction(const char* funcname, int nparams, int nrets);
+        void            pushGlobalFunction(const char* funcname);
 
         // String shit
         void            pushString(const std::string& str);

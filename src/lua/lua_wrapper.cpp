@@ -128,16 +128,13 @@ namespace lsh
     
     int Lua::callFunction(int nparams, int nrets)
     {
-        if(lua_type(L, -1) != LUA_TFUNCTION)
-            throw Error("Internal Error:  Lua::callFunction is called without having a function on the top of the stack.");
-
         int expectedZero = lua_gettop(L) - nparams - 1;
         if(expectedZero < 0)
             throw Error("Internal Error:  Not enough values pushed to the stack in Lua::callFunction");
         
         LuaStackSaver stk(expectedZero, L);
 
-        /*
+#if 0
         int msgh = expectedZero + 1;
 
         lua_pushcfunction( L, &luaMessageHandler );             // cram the message handler in there
@@ -146,24 +143,20 @@ namespace lsh
         handleLuaError( lua_pcall( L, nparams, nrets, msgh ) );
 
         lua_remove( L, msgh );                                  // remove the message handler
-        */
+#else
         handleLuaError( lua_pcall( L, nparams, nrets, 0 ) );
+#endif
 
         stk.escape();
         return lua_gettop(L) - expectedZero;
     }
 
-    int Lua::callGlobalFunction(const char* funcname, int nparams, int nrets)
+    void Lua::pushGlobalFunction(const char* funcname)
     {
         if(lua_getglobal(L, funcname) != LUA_TFUNCTION)
         {
-            Log::wrn("'" + std::string(funcname) + "' is not a global function name.");
+            throw Error("Expected '" + std::string(funcname) + "' to be a global function name.");
         }
-        else
-        {
-            return callFunction(nparams,nrets);
-        }
-        return 0;
     }
 
     

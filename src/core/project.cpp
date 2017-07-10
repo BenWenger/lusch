@@ -295,15 +295,16 @@ namespace lsh
         }
     }
     
-    int Project::doCallback(const char* callback_name, int params, int rets)
+    bool Project::pushCallback(const char* callback_name)
     {
         auto& x = blueprint.callbacks.find(callback_name);
         if(x != blueprint.callbacks.end())
         {
-            return blueprint.lua.callGlobalFunction(x->second.c_str(), params, rets);
+            blueprint.lua.pushGlobalFunction(x->second.c_str());
+            return true;
         }
 
-        return 0;
+        return false;
     }
 
     void Project::makeDirty()
@@ -337,9 +338,12 @@ namespace lsh
 
         /////////////////////////////////////////
         //  If there is a pre-import callback... call it
-        int top = lua_gettop(lua);
-        int params = doCallback("pre-import",0,LUA_MULTRET);
-        int top2 = lua_gettop(lua);
+        int debugger;
+        int paramstackpos = lua_gettop(lua) + 1;
+        int params = 0;
+        if(pushCallback("pre-import"))
+            params = lua.callFunction(0,LUA_MULTRET);
+        debugger = lua_gettop(lua);
 
         //  [Safe] Call each section's import function
         for(auto& x : blueprint.sections)
@@ -347,15 +351,21 @@ namespace lsh
             LuaStackSaver loopstk(lua);
 
             BEGIN_SAFE
-            for(int i = 0; i < params; ++i)         lua_pushvalue(lua, top+i);
-            lua.callGlobalFunction(x.importFunc.c_str(), params, 0);
+            lua.pushGlobalFunction(x.importFunc.c_str());
+        debugger = lua_gettop(lua);
+            for(int i = 0; i < params; ++i)
+            {
+                lua_pushvalue(lua, paramstackpos+i);
+        debugger = lua_gettop(lua);
+            }
+            lua.callFunction(params, 0);
+        debugger = lua_gettop(lua);
             END_SAFE
         }
-        int top3 = lua_gettop(lua);
-
+        
+        debugger = lua_gettop(lua);
         /////////////////////////////////////
-        //  Call the post-import if there is one
-        doCallback("post-import", params, 0);
+        //  TODO - call post-import
     }
 
     bool Project::doSave()

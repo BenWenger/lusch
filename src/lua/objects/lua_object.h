@@ -77,10 +77,13 @@ namespace lsh
         LuaObject& operator = (const LuaObject&) = delete;
 
         //  To be implemented by LuaUserData<T>
-        virtual void            pushIndexingFunction(Lua& lua) const = 0;
+        virtual void                pushIndexingFunction(Lua& lua) const = 0;
+        virtual const char* const   getClassNameV() const = 0;
 
 
     protected:
+
+
         static int lua__gc(lua_State* L)
         {
             try
@@ -137,12 +140,16 @@ namespace lsh
         {
             lua_pushcfunction(lua, &LuaUserData<T>::lua__index);
         }
+        virtual const char* const   getClassNameV() const override
+        {
+            return T::getClassName();
+        }
 
         static int lua__index(lua_State* L)
         {
             try
             {
-                auto str = lua_tostring(L, 1);
+                auto str = lua_tostring(L, 2);
                 if(!str)        lua_pushnil(L);
                 else            LuaFunction::pushMember<T>( L, str );
 
@@ -174,21 +181,24 @@ namespace lsh
         Ptr** pp = reinterpret_cast<Ptr**>(rawptr);
 
         // Step 2:  build the metatable
-        lua_createtable(lua, 0, 3);
-        lua_pushcfunction(lua, &LuaObject::lua__gc);
-        lua_setfield(lua, -2, "__gc");
-        pushIndexingFunction(lua);                      // the one thing that is type specific
-        lua_setfield(lua, -2, "__index");
-        lua_newtable(lua);                              // could this just be nil? ??
-        lua_setfield(lua, -2, "__metatable");
-
-                // TODO - do __eq?
+        auto classname = getClassNameV();
+        if( luaL_newmetatable(lua, classname) )
+        {
+            lua_pushcfunction(lua, &LuaObject::lua__gc);
+            lua_setfield(lua, -2, "__gc");
+            pushIndexingFunction(lua);                      // the one thing that is type specific
+            lua_setfield(lua, -2, "__index");
+            lua_newtable(lua);                              // could this just be nil? ??
+            lua_setfield(lua, -2, "__metatable");
+                    // TODO - do __eq?
+        }
+        lua_pop(lua, 1);
 
         // Step 3:  put the shared pointer in Lua owned memory
         *pp = new Ptr( shared_from_this() );
 
         // Step 4:  assign the metatable
-        lua_setmetatable(lua, -2);
+        luaL_setmetatable(lua, classname);
 
         // Now everything is bound -- and ownership is properly shared!  We're done!
         //    but leave the user data on the stack, as that was the entire point of all this

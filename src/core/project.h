@@ -64,7 +64,7 @@ namespace lsh
         std::unordered_map<std::string, std::size_t>    fileInfoIndexes;
         std::unordered_map<std::string, ProjectData>    dat;
         
-        int         doCallback(const char* callback_name, int params, int rets);
+        bool        pushCallback(const char* callback_name);
 
 
         json::object dataToJson() const;

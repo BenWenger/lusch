@@ -13,8 +13,8 @@ importArmor = function(file)
     file:seek( "set", armor_baseStateOffset )
     
     for i=0, armor_pieceCount-1 do
-        id = string.format("%d", i)
-        evade, absorb, element, spell = file:read(4):byte(1,4)
+        local id = string.format("%d", i)
+        local evade, absorb, element, spell = file:read(4):byte(1,4)
 
         lsh.set( "armor.evade."..id,    evade )
         lsh.set( "armor.absorb."..id,   absorb )
