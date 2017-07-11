@@ -10,7 +10,7 @@ armor_baseStatOffset    = 0x30150
 
 
 importArmor = function(file)
-    file:seek( "set", armor_baseStateOffset )
+    file:seek( "set", armor_baseStatOffset )
     
     for i=0, armor_pieceCount-1 do
         local id = string.format("%d", i)
@@ -25,7 +25,7 @@ end
 
 
 exportArmor = function(file)
-    file:seek( "set", armor_baseStateOffset )
+    file:seek( "set", armor_baseStatOffset )
     
     for i=0, armor_pieceCount-1 do
         id = string.format("%d", i)

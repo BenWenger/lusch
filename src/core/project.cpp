@@ -338,12 +338,10 @@ namespace lsh
 
         /////////////////////////////////////////
         //  If there is a pre-import callback... call it
-        int debugger;
         int paramstackpos = lua_gettop(lua) + 1;
         int params = 0;
         if(pushCallback("pre-import"))
             params = lua.callFunction(0,LUA_MULTRET);
-        debugger = lua_gettop(lua);
 
         //  [Safe] Call each section's import function
         for(auto& x : blueprint.sections)
@@ -352,18 +350,14 @@ namespace lsh
 
             BEGIN_SAFE
             lua.pushGlobalFunction(x.importFunc.c_str());
-        debugger = lua_gettop(lua);
             for(int i = 0; i < params; ++i)
             {
                 lua_pushvalue(lua, paramstackpos+i);
-        debugger = lua_gettop(lua);
             }
             lua.callFunction(params, 0);
-        debugger = lua_gettop(lua);
             END_SAFE
         }
         
-        debugger = lua_gettop(lua);
         /////////////////////////////////////
         //  TODO - call post-import
     }
